@@ -5,12 +5,13 @@
 int windowWidth = 640;
 int windowHeight = 480;
 
-void viewportInit(GLFWwindow* window);
-void windowResizeCallback(GLFWwindow* window, int width, int height);
+void viewportInit(GLFWwindow *window);
+
+void windowResizeCallback(GLFWwindow *window, int width, int height);
+
 void eventHandler(GLFWwindow *window);
 
-int main()
-{
+int main() {
     /* Initialize the library */
     if (!glfwInit())
         return -1;
@@ -39,14 +40,15 @@ int main()
 
 
     float vertices[] = {
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-       -0.5f, -0.5f, 0.0f,  // bottom left
-       -0.5f,  0.5f, 0.0f   // top left
-   };
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
+        0.5f, 0.5f, 0.0f, // top right
+        0.5f, -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f // top left
+    };
+    unsigned int indices[] = {
+        // note that we start from 0!
+        0, 1, 3, // first triangle
+        1, 2, 3 // second triangle
     };
 
     unsigned int vao;
@@ -66,18 +68,18 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    const char* vertexShaderSource = ""
-        "#version 330 core\n"
-        "layout (location = 0) in vec3 pos;\n"
-        "void main() {\n"
-        "gl_Position = vec4(pos, 1.0);\n"
-        "}";
+    const char *vertexShaderSource = ""
+            "#version 330 core\n"
+            "layout (location = 0) in vec3 pos;\n"
+            "void main() {\n"
+            "gl_Position = vec4(pos, 1.0);\n"
+            "}";
 
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
     glCompileShader(vertexShader);
 
-    int  success;
+    int success;
     char infoLog[512];
 
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
@@ -86,12 +88,12 @@ int main()
         std::cout << "Vertex Shader compilation failed: " << infoLog << std::endl;
     }
 
-    const char* fragmentShaderSource = ""
-        "#version 330 core\n"
-        "out vec4 color;\n"
-        "void main() {\n"
-        "   color = vec4(1.0f, 0.5f, 0.5f, 1.0f);\n"
-        "}";
+    const char *fragmentShaderSource = ""
+            "#version 330 core\n"
+            "out vec4 color;\n"
+            "void main() {\n"
+            "   color = vec4(1.0f, 0.5f, 0.5f, 1.0f);\n"
+            "}";
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
@@ -109,7 +111,7 @@ int main()
     glLinkProgram(shaderProgram);
 
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success) {
+    if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
         std::cout << "Program linking failed: " << infoLog << std::endl;
     }
@@ -147,11 +149,11 @@ void viewportInit(GLFWwindow *window) {
     glViewport(0, 0, width, height);
 }
 
-void windowResizeCallback(GLFWwindow* window, int width, int height) {
+void windowResizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
 void eventHandler(GLFWwindow *window) {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
