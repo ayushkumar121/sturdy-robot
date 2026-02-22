@@ -3,7 +3,7 @@ CXX=g++
 CXX_FLAGS=-Wall -std=c++23 -Ivender/glad/include -Ivender/stb
 CXX_LIBS=-lglfw -lm -lGL
 
-SRC := main.cpp Shader.cpp Basic.cpp Texture.cpp ShaderLibrary.cpp vender/glad/src/gl.c
+SRC := main.cpp Shader.cpp Basic.cpp Texture.cpp ShaderLibrary.cpp Quad.cpp GameContext.cpp vender/glad/src/gl.c
 
 all: $(PROJECT_NAME)
 

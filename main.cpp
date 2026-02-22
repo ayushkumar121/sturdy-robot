@@ -5,6 +5,8 @@
 #include <stb_image.h>
 
 #include "Basic.h"
+#include "GameContext.h"
+#include "Quad.h"
 #include "Shader.h"
 #include "ShaderLibrary.h"
 #include "Texture.h"
@@ -16,6 +18,8 @@ void viewportInit(GLFWwindow *window);
 void windowResizeCallback(GLFWwindow *window, int width, int height);
 void eventHandler(GLFWwindow *window);
 void errorCallback(int error, const char *description);
+void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar * message,
+                          const void * user_param);
 
 int main() {
     glfwSetErrorCallback(errorCallback);
@@ -40,6 +44,9 @@ int main() {
         return -1;
     }
 
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(debugMessageCallback, NULL);
+
     std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
@@ -47,54 +54,22 @@ int main() {
     viewportInit(window);
     glfwSetFramebufferSizeCallback(window, windowResizeCallback);
 
-    constexpr float vertices[] = {
-        // positions       // texture coords
-        0.5f,  0.5f, 0.0f,  1.0f, 1.0f,   // top right
-        0.5f, -0.5f, 0.0f,  1.0f, 0.0f,   // bottom right
-       -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,   // bottom left
-       -0.5f,  0.5f, 0.0f,  0.0f, 1.0f    // top left
-    };
-
-    constexpr unsigned int indices[] = {
-        // note that we start from 0!
-        0, 1, 3, // first triangle
-        1, 2, 3 // second triangle
-    };
-
-    unsigned int vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    unsigned int vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    unsigned int ebo;
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    Quad quad(0.0f, 0.0f, 300.0f, 400.0f, {0.0f, 0.0f, 0.0f, 0.0f});
+    Quad quad2(300.0f, 400.0f, 300.0f, 400.0f, {0.0f, 0.0f, 0.0f, 0.0f});
 
     stbi_set_flip_vertically_on_load(true);
 
     Texture tex1("assets/wall.jpg");
     Texture tex2("assets/awesomeface.png");
 
-    auto transform = Basic::Mat4::identity();
     auto view = Basic::Mat4::identity();
 
-    ShaderLibrary shaderLibrary;
-
-    const Shader& shader = shaderLibrary.getShader(ShaderLibrary::ShaderType::TEXTURED);
+    const Shader& shader = ShaderLibrary::getInstance().getShader(ShaderLibrary::ShaderType::TEXTURED);
     shader.bind();
     shader.setValue("tex1", 0);
     shader.setValue("tex2", 1);
+
+    std::cout << "Starting main loop" << std::endl;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
@@ -108,25 +83,12 @@ int main() {
         tex2.bind(1);
 
         shader.bind();
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-
-        auto projection = Basic::Mat4::projection(width, height);
-
-        Basic::Mat4 scaleMat = Basic::Mat4::scale(200.0f, 200.0f, 1.0f);
-        Basic::Mat4 translationMat = Basic::Mat4::translate(width/2, height/2, 0.0f);
         shader.setValue("view", view);
-        shader.setValue("projection", projection);
-        shader.setValue("transform", transform * translationMat * scaleMat);
 
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
+        quad.draw();
+        quad2.draw();
 
-        /* Swap front and back buffers */
         glfwSwapBuffers(window);
-
-        /* Poll for and process events */
         glfwPollEvents();
     }
 
@@ -137,10 +99,17 @@ int main() {
 void viewportInit(GLFWwindow *window) {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
+
+    GameContext::getInstance().setFrameWidth(width);
+    GameContext::getInstance().setFrameHeight(height);
+
     glViewport(0, 0, width, height);
 }
 
 void windowResizeCallback(GLFWwindow *window, int width, int height) {
+    GameContext::getInstance().setFrameWidth(width);
+    GameContext::getInstance().setFrameHeight(height);
+
     glViewport(0, 0, width, height);
 }
 
@@ -151,4 +120,8 @@ void eventHandler(GLFWwindow *window) {
 
 void errorCallback(int error, const char *description) {
     std::cerr << "GLFW Error: " << description << std::endl;
+}
+
+void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *user_param) {
+    std::cout <<"GL Message: " << message << std::endl;
 }

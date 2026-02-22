@@ -53,14 +53,16 @@ Shader::Shader(std::string_view vertexPath, std::string_view fragmentPath) {
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+    std::cout << "Shader program linking success: " << success << std::endl;
 }
 
 void Shader::bind() const {
     glUseProgram(shaderId);
 }
 
-void Shader::setValue(std::string_view name, float x, float y, float z, float w) const {
-    glUniform4f(glGetUniformLocation(shaderId, name.data()), x, y, z, w);
+void Shader::setValue(std::string_view name, Basic::Vec4 vec4) const {
+    glUniform4f(glGetUniformLocation(shaderId, name.data()), vec4.x, vec4.y, vec4.z, vec4.w);
 }
 
 void Shader::setValue(std::string_view name, float value) const {

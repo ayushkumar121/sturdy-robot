@@ -15,10 +15,14 @@ public:
         TEXTURED
     };
 
-    ShaderLibrary();
+    ~ShaderLibrary();
+    ShaderLibrary(const ShaderLibrary&) = delete;
+    ShaderLibrary& operator=(const ShaderLibrary&) = delete;
 
+    static ShaderLibrary& getInstance();
     Shader& getShader(ShaderType type);
 private:
+    ShaderLibrary();
     std::unordered_map<ShaderType, Shader> shaders;
 };
 
