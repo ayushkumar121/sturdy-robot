@@ -5,7 +5,6 @@
 #include "Shader.h"
 
 #include <glad/gl.h>
-#include <fstream>
 #include <iostream>
 
 #include "Basic.h"

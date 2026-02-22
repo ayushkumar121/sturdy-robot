@@ -2,9 +2,6 @@
 // Created by ari on 2/23/26.
 //
 
-#include <iostream>
-#include <algorithm>
-
 #include "Renderer.h"
 #include "QuadMesh.h"
 #include "ShaderLibrary.h"
