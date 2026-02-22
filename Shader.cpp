@@ -55,7 +55,7 @@ Shader::Shader(std::string_view vertexPath, std::string_view fragmentPath) {
     glDeleteShader(fragmentShader);
 }
 
-void Shader::use() const {
+void Shader::bind() const {
     glUseProgram(shaderId);
 }
 
@@ -69,4 +69,8 @@ void Shader::setValue(std::string_view name, float value) const {
 
 void Shader::setValue(std::string_view name, int value) const {
     glUniform1i(glGetUniformLocation(shaderId, name.data()), value);
+}
+
+void Shader::setValue(std::string_view name, Basic::Mat4 mat4) const {
+    glUniformMatrix4fv(glGetUniformLocation(shaderId, name.data()), 1, GL_FALSE, &mat4.m00);
 }
