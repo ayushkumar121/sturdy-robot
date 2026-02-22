@@ -4,6 +4,7 @@
 
 #include "Basic.h"
 
+#include <cmath>
 #include <format>
 #include <fstream>
 #include <iostream>
@@ -17,10 +18,45 @@ Basic::Mat4 Basic::Mat4::identity() {
     return result;
 }
 
+Basic::Mat4 Basic::Mat4::translate(float x, float y, float z) {
+    Mat4 result = identity();
+
+    result.m[0][3] = x;
+    result.m[1][3] = y;
+    result.m[2][3] = z;
+
+    result.debugPrint();
+
+    return result;
+}
+
+Basic::Mat4 Basic::Mat4::rotateZ(const float angle) {
+    Mat4 result = identity();
+
+    const float c = std::cos(angle);
+    const float s = std::sin(angle);
+
+    result.m[0][0] = c;
+    result.m[0][1] = -s;
+    result.m[1][0] = s;
+    result.m[1][1] = c;
+
+    return result;
+}
+
+void Basic::Mat4::debugPrint() const {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            std::cout << this->m[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
 Basic::Mat4 Basic::Mat4::operator+(const Mat4 &mat4) const {
     Mat4 result{};
-    for (unsigned int i = 0; i < 4; ++i) {
-        for (unsigned int j = 0; j < 4; ++j) {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
             result.m[i][j] = this->m[i][j] + mat4.m[i][j];
         }
     }
@@ -29,10 +65,10 @@ Basic::Mat4 Basic::Mat4::operator+(const Mat4 &mat4) const {
 
 Basic::Mat4 Basic::Mat4::operator*(const Mat4 &mat4) const {
     Mat4 result{};
-    for (unsigned int i = 0; i < 4; ++i) {
-        for (unsigned int j = 0; j < 4; ++j) {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
             float sum = 0.0f;
-            for (unsigned int k = 0; k < 4; ++k) {
+            for (int k = 0; k < 4; ++k) {
                 sum += this->m[i][k] * mat4.m[k][j];
             }
             result.m[i][j] = sum;

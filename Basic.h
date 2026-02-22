@@ -5,23 +5,21 @@
 #ifndef STURDY_ROBOT_BASIC_H
 #define STURDY_ROBOT_BASIC_H
 
-#include <cmath>
 #include <string_view>
 
 namespace Basic {
+    struct Vec3 {
+        union {
+            struct {float x,y,z;};
+            float xyz[3];
+        };
+    };
+
     struct Vec4 {
         union {
             struct {float x,y,z,w;};
             float xyzw[4];
         };
-
-        [[nodiscard]] float squaredLength() const {
-            return xyzw[0]*xyzw[0] + xyzw[1]*xyzw[1] + xyzw[2]*xyzw[2];
-        }
-
-        [[nodiscard]] float length() const {
-            return sqrtf(squaredLength());
-        }
     };
 
     struct Mat4 {
@@ -31,6 +29,10 @@ namespace Basic {
         };
 
         static Mat4 identity();
+        static Mat4 translate(float x, float y, float z);
+        static Mat4 rotateZ(float angle);
+
+        void debugPrint() const;
 
         Mat4 operator+(const Mat4 &mat4) const;
         Mat4 operator*(const Mat4 &mat4) const;

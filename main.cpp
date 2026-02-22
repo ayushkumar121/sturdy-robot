@@ -86,6 +86,8 @@ int main() {
     Texture tex2("assets/awesomeface.png");
 
     auto transform = Basic::Mat4::identity();
+    // transform = transform * Basic::Mat4::translate(1.0f, 0.0, 0.0f);
+    transform = transform * Basic::Mat4::rotateZ(std::numbers::pi/4);
 
     const Shader shader("assets/vertex.glsl", "assets/fragment.glsl");
     shader.bind();
