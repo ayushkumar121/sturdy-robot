@@ -60,5 +60,13 @@ void Shader::use() const {
 }
 
 void Shader::setValue(std::string_view name, float x, float y, float z, float w) const {
-    glUniform4f(glGetUniformLocation(shaderId, name.data()), z, y, x, w);
+    glUniform4f(glGetUniformLocation(shaderId, name.data()), x, y, z, w);
+}
+
+void Shader::setValue(std::string_view name, float value) const {
+    glUniform1f(glGetUniformLocation(shaderId, name.data()), value);
+}
+
+void Shader::setValue(std::string_view name, int value) const {
+    glUniform1i(glGetUniformLocation(shaderId, name.data()), value);
 }

@@ -4,6 +4,7 @@
 
 #include "Basic.h"
 
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -11,7 +12,7 @@
 std::string Basic::readEntireFile(std::string_view fileName) {
     std::ifstream file(fileName.data());
     if (!file) {
-        throw std::runtime_error("File not found");
+        throw std::runtime_error(std::format("File {} not found", fileName));
     }
 
     file.seekg(0, std::ios::end);

@@ -1,6 +1,6 @@
 PROJECT_NAME=game
 CXX=g++
-CXX_FLAGS=-Wall -std=c++17 -Ivender/glad/include
+CXX_FLAGS=-Wall -std=c++23 -Ivender/glad/include -Ivender/stb
 CXX_LIBS=-lglfw -lm -lGL
 
 SRC := main.cpp Shader.cpp Basic.cpp vender/glad/src/gl.c

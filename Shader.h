@@ -12,6 +12,8 @@ public:
 
     void use() const;
     void setValue(std::string_view name, float x, float y, float z, float w) const;
+    void setValue(std::string_view name, float value) const;
+    void setValue(std::string_view name, int value) const;
 private:
     unsigned int shaderId;
 };
