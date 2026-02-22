@@ -21,11 +21,19 @@ Basic::Mat4 Basic::Mat4::identity() {
 Basic::Mat4 Basic::Mat4::translate(float x, float y, float z) {
     Mat4 result = identity();
 
-    result.m[0][3] = x;
-    result.m[1][3] = y;
-    result.m[2][3] = z;
+    result.m03 = x;
+    result.m13 = y;
+    result.m23 = z;
 
-    result.debugPrint();
+    return result;
+}
+
+Basic::Mat4 Basic::Mat4::scale(float x, float y, float z) {
+    Mat4 result = identity();
+
+    result.m00 = x;
+    result.m11 = y;
+    result.m22 = z;
 
     return result;
 }
@@ -36,10 +44,30 @@ Basic::Mat4 Basic::Mat4::rotateZ(const float angle) {
     const float c = std::cos(angle);
     const float s = std::sin(angle);
 
-    result.m[0][0] = c;
-    result.m[0][1] = -s;
-    result.m[1][0] = s;
-    result.m[1][1] = c;
+    result.m00 = c;
+    result.m01 = -s;
+    result.m10 = s;
+    result.m11 = c;
+
+    return result;
+}
+
+Basic::Mat4 Basic::Mat4::projection(const float width, const float height) {
+    float left = 0.0f;
+    float right = width;
+    float top = 0.0f;
+    float bottom = height;
+    float nearZ = -1.0f;
+    float farZ = 1.0f;
+
+    Mat4 result = identity();
+    result.m00 = 2.0f / (right - left);
+    result.m11 = 2.0f/ (top - bottom);
+    result.m22 = -2.0f / (farZ - nearZ);
+
+    result.m03 = -(right + left) / (right - left);
+    result.m13 = -(top + bottom) / (top - bottom);
+    result.m23 = -(farZ + nearZ) / (farZ - nearZ);
 
     return result;
 }

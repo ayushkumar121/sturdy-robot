@@ -6,6 +6,7 @@
 
 #include "Basic.h"
 #include "Shader.h"
+#include "ShaderLibrary.h"
 #include "Texture.h"
 
 int windowWidth = 640;
@@ -14,11 +15,11 @@ int windowHeight = 480;
 void viewportInit(GLFWwindow *window);
 void windowResizeCallback(GLFWwindow *window, int width, int height);
 void eventHandler(GLFWwindow *window);
+void errorCallback(int error, const char *description);
 
 int main() {
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
+    glfwSetErrorCallback(errorCallback);
+    glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -39,12 +40,12 @@ int main() {
         return -1;
     }
 
+    std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
 
     viewportInit(window);
     glfwSetFramebufferSizeCallback(window, windowResizeCallback);
-
 
     constexpr float vertices[] = {
         // positions       // texture coords
@@ -86,14 +87,14 @@ int main() {
     Texture tex2("assets/awesomeface.png");
 
     auto transform = Basic::Mat4::identity();
-    // transform = transform * Basic::Mat4::translate(1.0f, 0.0, 0.0f);
-    transform = transform * Basic::Mat4::rotateZ(std::numbers::pi/4);
+    auto view = Basic::Mat4::identity();
 
-    const Shader shader("assets/vertex.glsl", "assets/fragment.glsl");
+    ShaderLibrary shaderLibrary;
+
+    const Shader& shader = shaderLibrary.getShader(ShaderLibrary::ShaderType::TEXTURED);
     shader.bind();
     shader.setValue("tex1", 0);
     shader.setValue("tex2", 1);
-    shader.setValue("transform", transform);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
@@ -107,6 +108,17 @@ int main() {
         tex2.bind(1);
 
         shader.bind();
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        auto projection = Basic::Mat4::projection(width, height);
+
+        Basic::Mat4 scaleMat = Basic::Mat4::scale(200.0f, 200.0f, 1.0f);
+        Basic::Mat4 translationMat = Basic::Mat4::translate(width/2, height/2, 0.0f);
+        shader.setValue("view", view);
+        shader.setValue("projection", projection);
+        shader.setValue("transform", transform * translationMat * scaleMat);
+
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
@@ -135,4 +147,8 @@ void windowResizeCallback(GLFWwindow *window, int width, int height) {
 void eventHandler(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+void errorCallback(int error, const char *description) {
+    std::cerr << "GLFW Error: " << description << std::endl;
 }

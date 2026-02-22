@@ -30,7 +30,9 @@ namespace Basic {
 
         static Mat4 identity();
         static Mat4 translate(float x, float y, float z);
+        static Mat4 scale(float x, float y, float z);
         static Mat4 rotateZ(float angle);
+        static Mat4 projection(float width, float height);
 
         void debugPrint() const;
 
