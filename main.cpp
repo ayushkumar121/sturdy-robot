@@ -25,7 +25,7 @@ int main() {
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
@@ -43,8 +43,10 @@ int main() {
         return -1;
     }
 
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(debugMessageCallback, NULL);
+    if (glDebugMessageCallback) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(debugMessageCallback, nullptr);
+    }
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

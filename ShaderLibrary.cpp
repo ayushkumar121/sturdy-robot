@@ -10,6 +10,10 @@
 ShaderLibrary::ShaderLibrary() {
     std::cout << "Compiling shaders" << std::endl;
     shaders.emplace(
+        ShaderType::COLORED,
+        Shader("assets/shaders/basic.vert", "assets/shaders/colored.frag")
+    );
+    shaders.emplace(
         ShaderType::TEXTURED,
         Shader("assets/shaders/basic.vert", "assets/shaders/textured.frag")
     );

@@ -14,7 +14,7 @@ class Renderer {
 public:
     void begin(const Basic::Mat4 &projection);
     void submit(Quad& quad);
-    void end() const;
+    void end();
 private:
     std::vector<Quad> drawList;
     Basic::Mat4 projection;
