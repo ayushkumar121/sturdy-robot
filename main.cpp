@@ -12,6 +12,7 @@
 
 int windowWidth = 640;
 int windowHeight = 480;
+std::vector<Quad> quads;
 
 void viewportInit(GLFWwindow *window);
 void windowResizeCallback(GLFWwindow *window, int width, int height);
@@ -19,6 +20,7 @@ void eventHandler(GLFWwindow *window);
 void errorCallback(int error, const char *description);
 void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar * message,
                           const void * user_param);
+void renderFrame(GLFWwindow *window);
 
 int main() {
     glfwSetErrorCallback(errorCallback);
@@ -35,8 +37,8 @@ int main() {
         return -1;
     }
 
-    /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    glfwSetWindowRefreshCallback(window, renderFrame);
 
     if (!gladLoadGL(glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -65,32 +67,15 @@ int main() {
     Texture& tex1 = textureLib.getTexture("assets/wall.jpg");
     Texture& tex2 = textureLib.getTexture("assets/awesomeface.png");
 
-    std::vector<Quad> quads;
     quads.emplace_back(0.0f, 0.0f, 400.0f, 400.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex1);
     quads.emplace_back(300.0f, 0.0f, 100.0f, 100.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex2);
     quads.emplace_back(50.0f, 50.0f, 60.0f, 60.0f, Basic::Vec4{0.3f, 0.5f, 0.0f, 0.5f}, nullptr);
 
     std::cout << "Starting main loop" << std::endl;
 
-    /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         eventHandler(window);
-
-        /* Render here */
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-
-        Renderer renderer;
-        renderer.begin(Basic::Mat4::projection(width, height));
-        for (auto &quad : quads) {
-            renderer.submit(quad);
-        }
-        renderer.end();
-
-        glfwSwapBuffers(window);
+        renderFrame(window);
         glfwPollEvents();
     }
 
@@ -119,4 +104,21 @@ void errorCallback(int error, const char *description) {
 
 void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *user_param) {
     std::cout <<"GL Message: " << message << std::endl;
+}
+
+void renderFrame(GLFWwindow *window) {
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+
+    Renderer renderer;
+    renderer.begin(Basic::Mat4::projection(width, height));
+    for (auto &quad : quads) {
+        renderer.submit(quad);
+    }
+    renderer.end();
+
+    glfwSwapBuffers(window);
 }
