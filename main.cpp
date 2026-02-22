@@ -5,11 +5,10 @@
 #include <stb_image.h>
 
 #include "Basic.h"
-#include "GameContext.h"
 #include "Quad.h"
-#include "Shader.h"
-#include "ShaderLibrary.h"
+#include "Renderer.h"
 #include "Texture.h"
+#include "TextureLibrary.h"
 
 int windowWidth = 640;
 int windowHeight = 480;
@@ -54,20 +53,17 @@ int main() {
     viewportInit(window);
     glfwSetFramebufferSizeCallback(window, windowResizeCallback);
 
-    Quad quad(0.0f, 0.0f, 300.0f, 400.0f, {0.0f, 0.0f, 0.0f, 0.0f});
-    Quad quad2(300.0f, 400.0f, 300.0f, 400.0f, {0.0f, 0.0f, 0.0f, 0.0f});
-
     stbi_set_flip_vertically_on_load(true);
 
-    Texture tex1("assets/wall.jpg");
-    Texture tex2("assets/awesomeface.png");
+    // Loading textures
+    TextureLibrary& textureLib = TextureLibrary::getInstance();
+    Texture& tex1 = textureLib.getTexture("assets/wall.jpg");
+    Texture& tex2 = textureLib.getTexture("assets/awesomeface.png");
 
-    auto view = Basic::Mat4::identity();
-
-    const Shader& shader = ShaderLibrary::getInstance().getShader(ShaderLibrary::ShaderType::TEXTURED);
-    shader.bind();
-    shader.setValue("tex1", 0);
-    shader.setValue("tex2", 1);
+    std::vector<Quad> quads;
+    quads.emplace_back(0.0f, 0.0f, 300.0f, 400.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex1);
+    quads.emplace_back(300.0f, 0.0f, 100.0f, 100.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex2);
+    quads.emplace_back(50.0f, 50.0f, 60.0f, 60.0f, Basic::Vec4{0.3f, 0.5f, 0.0f, 1.0f}, nullptr);
 
     std::cout << "Starting main loop" << std::endl;
 
@@ -79,14 +75,15 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        tex1.bind(0);
-        tex2.bind(1);
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
 
-        shader.bind();
-        shader.setValue("view", view);
-
-        quad.draw();
-        quad2.draw();
+        Renderer renderer;
+        renderer.begin(Basic::Mat4::projection(width, height));
+        for (auto &quad : quads) {
+            renderer.submit(quad);
+        }
+        renderer.end();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -99,17 +96,10 @@ int main() {
 void viewportInit(GLFWwindow *window) {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-
-    GameContext::getInstance().setFrameWidth(width);
-    GameContext::getInstance().setFrameHeight(height);
-
     glViewport(0, 0, width, height);
 }
 
 void windowResizeCallback(GLFWwindow *window, int width, int height) {
-    GameContext::getInstance().setFrameWidth(width);
-    GameContext::getInstance().setFrameHeight(height);
-
     glViewport(0, 0, width, height);
 }
 

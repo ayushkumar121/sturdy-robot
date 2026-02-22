@@ -12,7 +12,7 @@ public:
     Texture(std::string_view texturePath);
     void bind(unsigned int slot) const;
 private:
-    unsigned int textureId;
+    unsigned int texture;
 };
 
 

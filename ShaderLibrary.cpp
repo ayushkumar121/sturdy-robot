@@ -8,6 +8,7 @@
 #include <ostream>
 
 ShaderLibrary::ShaderLibrary() {
+    std::cout << "Compiling shaders" << std::endl;
     shaders.emplace(
         ShaderType::TEXTURED,
         Shader("assets/shaders/basic.vert", "assets/shaders/textured.frag")

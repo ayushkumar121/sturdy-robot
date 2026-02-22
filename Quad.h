@@ -6,26 +6,15 @@
 #define STURDY_ROBOT_QUAD_H
 
 #include "Basic.h"
+#include "Texture.h"
 
 class Quad {
 public:
-    struct Vertex {
-        float pos[2];
-        float uv[2];
-    };
-
-    Quad(float x, float y, float width, float height, Basic::Vec4 color);
-    ~Quad();
-
-    void bind() const;
-    void draw() const;
-private:
     Basic::Vec4 color;
+    Texture* texture;
     float x, y, width, height;
 
-    unsigned int vao;
-    unsigned int vbo;
+    Quad(float x, float y, float width, float height, Basic::Vec4 color, Texture* texture);
 };
-
 
 #endif //STURDY_ROBOT_QUAD_H
