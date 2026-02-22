@@ -1,11 +1,14 @@
+PROJECT_NAME=game
 CXX=g++
-CXX_FLAGS=
+CXX_FLAGS=-Wall -std=c++17 -Ivender/glad/include
 CXX_LIBS=-lglfw -lGL
 
-all: game_glfw
+SRC := $(wildcard *.cpp)  vender/glad/src/gl.c
 
-game_glfw: game_glfw.cpp
-	$(CXX) -o game_glfw game_glfw.cpp $(CXX_FLAGS) $(CXX_LIBS)
+all: $(PROJECT_NAME)
+
+$(PROJECT_NAME): $(SRC)
+	$(CXX) -o $(PROJECT_NAME) $(SRC) $(CXX_FLAGS) $(CXX_LIBS)
 
 clean:
-	rm game_glfw
+	rm -f $(PROJECT_NAME)
