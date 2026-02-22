@@ -46,6 +46,9 @@ int main() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(debugMessageCallback, NULL);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
@@ -61,9 +64,9 @@ int main() {
     Texture& tex2 = textureLib.getTexture("assets/awesomeface.png");
 
     std::vector<Quad> quads;
-    quads.emplace_back(0.0f, 0.0f, 300.0f, 400.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex1);
+    quads.emplace_back(0.0f, 0.0f, 400.0f, 400.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex1);
     quads.emplace_back(300.0f, 0.0f, 100.0f, 100.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex2);
-    quads.emplace_back(50.0f, 50.0f, 60.0f, 60.0f, Basic::Vec4{0.3f, 0.5f, 0.0f, 1.0f}, nullptr);
+    quads.emplace_back(50.0f, 50.0f, 60.0f, 60.0f, Basic::Vec4{0.3f, 0.5f, 0.0f, 0.5f}, nullptr);
 
     std::cout << "Starting main loop" << std::endl;
 
