@@ -1,9 +1,9 @@
 PROJECT_NAME=game
 CXX=g++
 CXX_FLAGS=-Wall -std=c++17 -Ivender/glad/include
-CXX_LIBS=-lglfw -lGL
+CXX_LIBS=-lglfw -lm -lGL
 
-SRC := $(wildcard *.cpp)  vender/glad/src/gl.c
+SRC := main.cpp Shader.cpp Basic.cpp vender/glad/src/gl.c
 
 all: $(PROJECT_NAME)
 
