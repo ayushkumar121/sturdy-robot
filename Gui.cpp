@@ -38,10 +38,11 @@ bool Gui::button(Basic::Vec4 rect) {
     float mouseY = (float)ypos * ((float)frameHeight / (float)windowHeight);
 
     bool hovered = insideRect({mouseX, mouseY}, rect);
-    Basic::Vec4 color = hovered? Basic::hexColor(0xFF00FF00): Basic::hexColor(0xFFFFFFFF);
+	bool mouseDown = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    Basic::Vec4 color = hovered? (mouseDown? Basic::hexColor(0xFFFF0000): Basic::hexColor(0xFF00FF00)): Basic::hexColor(0xFFFFFFFF);
 
     Quad quad(rect.x, rect.y, rect.z, rect.w, color, nullptr);
     renderer.submit(quad);
 
-    return hovered && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    return hovered && mouseDown;
 }
