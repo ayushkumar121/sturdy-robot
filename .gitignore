@@ -20,12 +20,6 @@
 *.gch
 *.pch
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
 # Shared objects (inc. Windows DLLs)
 *.dll
 *.so
@@ -59,3 +53,6 @@ dkms.conf
 *.dwo
 
 game
+
+!vender/glfw/lib-arm64mac/libglfw.3.dylib
+!vender/glfw/lib-arm64mac/libglfw3.a
