@@ -1,5 +1,6 @@
 PROJECT_NAME=game
 CXX=g++
+CC=gcc
 CXX_FLAGS=-Wall -Wno-missing-braces -g -std=c++23 -Ivender/glad/include -Ivender/stb -Ivender/glfw/include
 
 UNAME_S := $(shell uname -s)
@@ -10,12 +11,15 @@ else
     CXX_LIBS=-lglfw -lGL -lX11 -ldl -lpthread -lm
 endif
 
-SRC := main.cpp Basic.cpp Texture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp Quad.cpp QuadMesh.cpp Renderer.cpp vender/glad/src/gl.c
+SRC := main.cpp Basic.cpp Texture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp Quad.cpp QuadMesh.cpp Renderer.cpp Gui.cpp
 
 all: $(PROJECT_NAME)
 
-$(PROJECT_NAME): $(SRC)
-	$(CXX) -o $(PROJECT_NAME) $(SRC) $(CXX_FLAGS) $(CXX_LIBS)
+$(PROJECT_NAME): $(SRC) gl.o
+	$(CXX) -o $(PROJECT_NAME) $(SRC) gl.o $(CXX_FLAGS) $(CXX_LIBS)
+
+gl.o: vender/glad/src/gl.c
+	$(CC) -c -o gl.o vender/glad/src/gl.c -Ivender/glad/include 
 
 clean:
 	rm -f $(PROJECT_NAME)

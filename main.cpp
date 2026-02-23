@@ -9,13 +9,15 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "TextureLibrary.h"
+#include "Gui.h"
 
-int windowWidth = 640;
-int windowHeight = 480;
+int frameWidth;
+int frameHeight;
+
 std::vector<Quad> quads;
 
 void viewportInit(GLFWwindow *window);
-void windowResizeCallback(GLFWwindow *window, int width, int height);
+void frameBufferResizeCallback(GLFWwindow *window, int width, int height);
 void eventHandler(GLFWwindow *window);
 void errorCallback(int error, const char *description);
 void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar * message,
@@ -31,14 +33,13 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow *window = glfwCreateWindow(windowWidth, windowHeight, "Game", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(1920, 1080, "Game", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetWindowRefreshCallback(window, renderFrame);
 
     if (!gladLoadGL(glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -58,18 +59,19 @@ int main() {
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
 
     viewportInit(window);
-    glfwSetFramebufferSizeCallback(window, windowResizeCallback);
-
-    stbi_set_flip_vertically_on_load(true);
+    glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
+    glfwSetWindowRefreshCallback(window, renderFrame);
 
     // Loading textures
     TextureLibrary& textureLib = TextureLibrary::getInstance();
     Texture& tex1 = textureLib.getTexture("assets/wall.jpg");
     Texture& tex2 = textureLib.getTexture("assets/awesomeface.png");
+    Texture& tex3 = textureLib.getTexture("assets/sheet.png");
 
     quads.emplace_back(0.0f, 0.0f, 400.0f, 400.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex1);
     quads.emplace_back(300.0f, 0.0f, 100.0f, 100.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex2);
-    quads.emplace_back(50.0f, 50.0f, 60.0f, 60.0f, Basic::Vec4{0.3f, 0.5f, 0.0f, 0.5f}, nullptr);
+    quads.emplace_back(50.0f, 50.0f, 60.0f, 60.0f, Basic::hexColor(0xFF00FF00), nullptr);
+    quads.emplace_back(300.0f, 400.0f, 500.0f, 400.0f, Basic::hexColor(0xFFFF0000), &tex3);
 
     std::cout << "Starting main loop" << std::endl;
 
@@ -84,12 +86,14 @@ int main() {
 }
 
 void viewportInit(GLFWwindow *window) {
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    glViewport(0, 0, width, height);
+    glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
+    glViewport(0, 0, frameWidth, frameHeight);
 }
 
-void windowResizeCallback(GLFWwindow *window, int width, int height) {
+void frameBufferResizeCallback(GLFWwindow *window, int width, int height) {
+    frameWidth = width;
+    frameHeight = height;
+
     glViewport(0, 0, width, height);
 }
 
@@ -110,15 +114,30 @@ void renderFrame(GLFWwindow *window) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-
+    // Normal Rendering
     Renderer renderer;
-    renderer.begin(Basic::Mat4::projection(width, height));
+    renderer.begin(Basic::Mat4::projection(frameWidth, frameHeight));
+
+    float widthf = (float)frameWidth;
+    float heightf = (float)frameHeight;
+
+    Texture& tex4 = TextureLibrary::getInstance().getTexture("assets/office.jpg");
+    Quad background(0.0f, 0.0f, widthf, heightf, Basic::hexColor(0xFFFFFFFF), &tex4);
+    renderer.submit(background);
+
     for (auto &quad : quads) {
         renderer.submit(quad);
     }
     renderer.end();
+
+    // GUI Layer
+    Gui gui;
+    gui.begin(window);
+    if (gui.button({widthf/2.0f, heightf/2.0f, 300.0f, 100.0f})) {
+        static int times = 0;
+        std::cout << "Clicked " << times++ << std::endl;
+    }
+    gui.end();
 
     glfwSwapBuffers(window);
 }

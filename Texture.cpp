@@ -5,11 +5,14 @@
 #include "Texture.h"
 
 #include <stdexcept>
+#include <iostream>
 
 #include "stb_image.h"
 #include "glad/gl.h"
 
 Texture::Texture(std::string_view texturePath): texture(0) {
+    std::cout << "Loading texture: " << texturePath << std::endl;
+
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 

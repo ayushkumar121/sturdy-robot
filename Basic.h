@@ -5,9 +5,17 @@
 #ifndef STURDY_ROBOT_BASIC_H
 #define STURDY_ROBOT_BASIC_H
 
+#include <cstdint>
 #include <string_view>
 
 namespace Basic {
+    struct Vec2 {
+        union {
+            struct {float x,y;};
+            float xy[2];
+        };
+    };
+
     struct Vec3 {
         union {
             struct {float x,y,z;};
@@ -18,9 +26,12 @@ namespace Basic {
     struct Vec4 {
         union {
             struct {float x,y,z,w;};
+            struct {float r,g,b,a;};
             float xyzw[4];
         };
     };
+
+    using Color = Vec4;
 
     struct Mat4 {
         union {
@@ -41,6 +52,7 @@ namespace Basic {
         Vec4 operator*(const Vec4 &vec4) const;
     };
 
+    Basic::Color hexColor(uint32_t hex);
     std::string readEntireFile(std::string_view fileName);
 }
 

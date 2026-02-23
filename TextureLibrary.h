@@ -16,7 +16,6 @@ public:
     static TextureLibrary& getInstance();
     Texture& getTexture(std::string_view texturePath);
 private:
-    TextureLibrary();
     std::unordered_map<std::string_view, Texture> textures;
 };
 
