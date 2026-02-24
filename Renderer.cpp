@@ -1,13 +1,11 @@
-//
 // Created by ari on 2/23/26.
-//
 
 #include "Renderer.h"
 #include "QuadMesh.h"
 #include "ShaderLibrary.h"
 
-void Renderer::begin(const Basic::Mat4 &projectionMat) {
-    this->projection = projectionMat;
+void Renderer::begin(Basic::Vec4 rect) {
+    this->projection = Basic::Mat4::projection(rect.x, rect.y, rect.z, rect.w);
     drawList.clear();
 }
 
@@ -43,8 +41,8 @@ void Renderer::end() {
         }
 
         auto transform = Basic::Mat4::identity()
-            * Basic::Mat4::translate(quad.x, quad.y, 0.0f)
-            * Basic::Mat4::scale(quad.width, quad.height, 1.0f);
+            * Basic::Mat4::translate(quad.rect.x, quad.rect.y, 0.0f)
+            * Basic::Mat4::scale(quad.rect.z, quad.rect.w, 1.0f);
 
         currentShader->setValue("transform", transform);
         currentShader->setValue("color", quad.color);

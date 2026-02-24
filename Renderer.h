@@ -1,24 +1,24 @@
-//
 // Created by ari on 2/23/26.
-//
 
-#ifndef STURDY_ROBOT_RENDERER_H
-#define STURDY_ROBOT_RENDERER_H
+#pragma once
+
 #include <vector>
 
-#include "Quad.h"
-#include "Shader.h"
-
+#include "Basic.h"
+#include "Texture.h"
 
 class Renderer {
 public:
-    void begin(const Basic::Mat4 &projection);
+    struct Quad {
+        Basic::Vec4 rect;
+        Basic::Color color;
+        Texture* texture;
+    };
+
+    void begin(Basic::Vec4 rect);
     void submit(Quad& quad);
     void end();
 private:
     std::vector<Quad> drawList;
     Basic::Mat4 projection;
 };
-
-
-#endif //STURDY_ROBOT_RENDERER_H

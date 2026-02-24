@@ -1,9 +1,6 @@
-//
 // Created by ari on 2/22/26.
-//
 
-#ifndef STURDY_ROBOT_BASIC_H
-#define STURDY_ROBOT_BASIC_H
+#pragma once
 
 #include <cstdint>
 #include <string_view>
@@ -43,7 +40,7 @@ namespace Basic {
         static Mat4 translate(float x, float y, float z);
         static Mat4 scale(float x, float y, float z);
         static Mat4 rotateZ(float angle);
-        static Mat4 projection(float width, float height);
+        static Mat4 projection(float x, float y, float width, float height);
 
         void debugPrint() const;
 
@@ -55,6 +52,3 @@ namespace Basic {
     Basic::Color hexColor(uint32_t hex);
     std::string readEntireFile(std::string_view fileName);
 }
-
-
-#endif //STURDY_ROBOT_BASIC_H

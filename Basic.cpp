@@ -38,7 +38,7 @@ Basic::Mat4 Basic::Mat4::scale(float x, float y, float z) {
     return result;
 }
 
-Basic::Mat4 Basic::Mat4::rotateZ(const float angle) {
+Basic::Mat4 Basic::Mat4::rotateZ(float angle) {
     Mat4 result = identity();
 
     const float c = std::cos(angle);
@@ -52,10 +52,10 @@ Basic::Mat4 Basic::Mat4::rotateZ(const float angle) {
     return result;
 }
 
-Basic::Mat4 Basic::Mat4::projection(const float width, const float height) {
-    float left = 0.0f;
+Basic::Mat4 Basic::Mat4::projection(float x, float y, float width, float height) {
+    float left = x;
     float right = width;
-    float top = 0.0f;
+    float top = y;
     float bottom = height;
     float nearZ = -1.0f;
     float farZ = 1.0f;

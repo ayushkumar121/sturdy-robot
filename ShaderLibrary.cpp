@@ -1,6 +1,4 @@
-//
 // Created by ari on 2/22/26.
-//
 
 #include "ShaderLibrary.h"
 
@@ -17,10 +15,14 @@ ShaderLibrary::ShaderLibrary() {
         ShaderType::TEXTURED,
         Shader("assets/shaders/basic.vert", "assets/shaders/textured.frag")
     );
+    shaders.emplace(
+        ShaderType::FONT,
+        Shader("assets/shaders/basic.vert", "assets/shaders/font.frag")
+    );
 }
 
 ShaderLibrary::~ShaderLibrary() {
-    std::cout << "Shader library destroyed" << std::endl;
+    std::cout << "Shader Library Destroyed" << std::endl;
 }
 
 ShaderLibrary& ShaderLibrary::getInstance() {

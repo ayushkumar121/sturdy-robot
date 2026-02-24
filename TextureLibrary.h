@@ -1,23 +1,17 @@
-//
 // Created by ari on 2/23/26.
-//
 
-#ifndef STURDY_ROBOT_TEXTURELIBRARY_H
-#define STURDY_ROBOT_TEXTURELIBRARY_H
+#pragma once
 
-#include <string_view>
+#include <string>
 #include <unordered_map>
 
 #include "Texture.h"
 
-
 class TextureLibrary {
 public:
+    ~TextureLibrary();
     static TextureLibrary& getInstance();
-    Texture& getTexture(std::string_view texturePath);
+    Texture& getTexture(std::string texturePath);
 private:
-    std::unordered_map<std::string_view, Texture> textures;
+    std::unordered_map<std::string, Texture> textures;
 };
-
-
-#endif //STURDY_ROBOT_TEXTURELIBRARY_H

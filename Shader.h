@@ -1,9 +1,7 @@
-//
 // Created by ari on 2/22/26.
-//
 
-#ifndef STURDY_ROBOT_SHADER_H
-#define STURDY_ROBOT_SHADER_H
+#pragma once
+
 #include <string_view>
 
 #include "Basic.h"
@@ -20,6 +18,3 @@ public:
 private:
     unsigned int shaderId;
 };
-
-
-#endif //STURDY_ROBOT_SHADER_H

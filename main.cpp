@@ -1,22 +1,20 @@
 #include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <format>
 
 #include "Basic.h"
-#include "Quad.h"
 #include "Renderer.h"
 #include "Texture.h"
 #include "TextureLibrary.h"
+#include "Font.h"
 #include "Gui.h"
+#include "TextRenderer.h"
 
-int frameWidth;
-int frameHeight;
+std::vector<Renderer::Quad> quads;
+Font* font;
+Font* font2;
 
-std::vector<Quad> quads;
-
-void viewportInit(GLFWwindow *window);
 void frameBufferResizeCallback(GLFWwindow *window, int width, int height);
 void eventHandler(GLFWwindow *window);
 void errorCallback(int error, const char *description);
@@ -25,6 +23,7 @@ void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity
 void renderFrame(GLFWwindow *window);
 
 int main() {
+    // Abtract away window creation
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
@@ -38,7 +37,6 @@ int main() {
         glfwTerminate();
         return -1;
     }
-
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGL(glfwGetProcAddress)) {
@@ -46,33 +44,36 @@ int main() {
         return -1;
     }
 
+    std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
+    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
+
     if (glDebugMessageCallback) {
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(debugMessageCallback, nullptr);
     }
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    int frameWidth, frameHeight;
+    glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
+    glViewport(0, 0, frameWidth, frameHeight);
 
-    std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
-
-    viewportInit(window);
     glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
     glfwSetWindowRefreshCallback(window, renderFrame);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Loading textures
     TextureLibrary& textureLib = TextureLibrary::getInstance();
     Texture& tex1 = textureLib.getTexture("assets/wall.jpg");
     Texture& tex2 = textureLib.getTexture("assets/awesomeface.png");
-    Texture& tex3 = textureLib.getTexture("assets/sheet.png");
 
-    quads.emplace_back(0.0f, 0.0f, 400.0f, 400.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex1);
-    quads.emplace_back(300.0f, 0.0f, 100.0f, 100.0f, Basic::Vec4{1.0f, 1.0f, 1.0f, 1.0f}, &tex2);
-    quads.emplace_back(50.0f, 50.0f, 60.0f, 60.0f, Basic::hexColor(0xFF00FF00), nullptr);
-    quads.emplace_back(300.0f, 400.0f, 500.0f, 400.0f, Basic::hexColor(0xFFFF0000), &tex3);
+    quads.emplace_back(Basic::Vec4{0.0f, 0.0f, 400.0f, 400.0f}, Basic::hexColor(0xFFFFFFFF), &tex1);
+    quads.emplace_back(Basic::Vec4{300.0f, 0.0f, 100.0f, 100.0f}, Basic::hexColor(0xFFFFFFFF), &tex2);
+    quads.emplace_back(Basic::Vec4{50.0f, 50.0f, 60.0f, 60.0f}, Basic::hexColor(0xFF00FF00), nullptr);
 
+    font = new Font("assets/Playfair.ttf", 48);
+    font2 = new Font("assets/SourceCodePro.ttf", 48);
     std::cout << "Starting main loop" << std::endl;
 
     while (!glfwWindowShouldClose(window)) {
@@ -85,15 +86,7 @@ int main() {
     return 0;
 }
 
-void viewportInit(GLFWwindow *window) {
-    glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
-    glViewport(0, 0, frameWidth, frameHeight);
-}
-
 void frameBufferResizeCallback(GLFWwindow *window, int width, int height) {
-    frameWidth = width;
-    frameHeight = height;
-
     glViewport(0, 0, width, height);
 }
 
@@ -114,26 +107,40 @@ void renderFrame(GLFWwindow *window) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // Basic::getScreenRect
+    int frameWidth, frameHeight;
+    glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
+
+    Basic::Vec4 screenRect{0.0f, 0.0f, (float)frameWidth, (float)frameHeight};
+ 
     // Normal Rendering
     Renderer renderer;
-    renderer.begin(Basic::Mat4::projection(frameWidth, frameHeight));
+    renderer.begin(screenRect);
 
-    float widthf = (float)frameWidth;
-    float heightf = (float)frameHeight;
-
-    Texture& tex4 = TextureLibrary::getInstance().getTexture("assets/office.jpg");
-    Quad background(0.0f, 0.0f, widthf, heightf, Basic::hexColor(0xFFFFFFFF), &tex4);
-    renderer.submit(background);
+    // Texture& tex4 = TextureLibrary::getInstance().getTexture("assets/office.jpg");
+    // Renderer::Quad background{screenRect, Basic::hexColor(0xFFFFFFFF), &tex4};
+    // renderer.submit(background);
 
     for (auto &quad : quads) {
         renderer.submit(quad);
     }
     renderer.end();
 
+    TextRenderer textRenderer;
+    textRenderer.begin(font, screenRect);
+    std::string str = "In a hole in the ground there lived a hobbit.\n"
+    "Not a nasty, dirty, wet hole, filled with the ends of worms and an oozy smell,\n"
+    "nor yet a dry, bare, sandy hole with nothing in it to sit down on or to eat:\n"
+    "it was a hobbit- hole, and that means comfort.";
+
+    // textRenderer.submit({"Hello World", {(float)frameWidth/2, (float)frameHeight/2}, Basic::hexColor(0xFF00FF00)});
+    textRenderer.submit({str, {600.0f, 600.0f}, Basic::hexColor(0xFFAAFFBB)});
+    textRenderer.end();
+
     // GUI Layer
     Gui gui;
-    gui.begin(window);
-    if (gui.button({widthf/2.0f, heightf/2.0f, 300.0f, 100.0f})) {
+    gui.begin(window, font2);
+    if (gui.button("Hello Worldg", {(float)frameWidth/2.0f, (float)frameHeight/2.0f})) {
         static int times = 0;
         std::cout << "Clicked " << times++ << std::endl;
     }
