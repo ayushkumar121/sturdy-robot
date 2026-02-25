@@ -18,7 +18,8 @@ public:
     void begin(Basic::Vec4 rect);
     void submit(Quad& quad);
     void end();
+    void clear();
 private:
     std::vector<Quad> drawList;
-    Basic::Mat4 projection;
+    Basic::Mat4 projection{};
 };

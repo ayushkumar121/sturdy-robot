@@ -50,3 +50,7 @@ void Renderer::end() {
         QuadMesh::getInstance().draw();
     }
 }
+
+void Renderer::clear() {
+    drawList.clear();
+}

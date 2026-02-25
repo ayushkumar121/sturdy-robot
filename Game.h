@@ -4,14 +4,15 @@
 
 #include <GLFW/glfw3.h>
 
+#include "Gui.h"
 #include "StoryEngine.h"
 
 class Game {
 public:
 	Game();
-	~Game();
 	void update(GLFWwindow* window);
 	void render(GLFWwindow* window);
 private:
 	StoryEngine storyEngine;
+	Gui gui;
 };

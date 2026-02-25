@@ -9,8 +9,13 @@
 
 class StoryEngine {
 public:
+    enum class SpeakerPosition {
+        LEFT, RIGHT
+    };
+
     struct Dialogue {
         std::string speaker;
+        SpeakerPosition speakerPosition;
         std::string text;
         std::string characterSpritePath;
         std::string backgroundPath;

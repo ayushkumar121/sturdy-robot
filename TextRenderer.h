@@ -2,24 +2,26 @@
 
 #pragma once
 
-#include <cstdint>
+#include <string_view>
 #include <vector>
 
 #include "Basic.h"
+#include "Font.h"
 
 class TextRenderer {
 public:
-	struct Glyph {
-		uint32_t textureId;
+	struct Text {
+		std::string_view data;
 		Basic::Vec2 pos;
-		Basic::Vec2 size;
 		Basic::Color color;
 	};
 
-	void begin(Basic::Vec4 rect);
-	void submit(Glyph glyph);
+	void begin(const Font* font, Basic::Vec4 rect);
+	void submit(Text text);
 	void end();
+	void clear();
 private:
-	std::vector<Glyph> drawList;
-	Basic::Mat4 projection;
+	const Font* font = nullptr;
+	std::vector<Text> drawList;
+	Basic::Mat4 projection{};
 };

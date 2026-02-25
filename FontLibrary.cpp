@@ -4,15 +4,25 @@
 
 #include <iostream>
 
+#include "GLFW/glfw3.h"
+
+static int determineFontSize() {
+    GLFWwindow* window = glfwGetCurrentContext();
+    int frameWidth, frameHeight;
+    glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
+
+    return frameHeight/30;
+}
+
 FontLibrary::FontLibrary() {
-	// TODO: make the sizes based on screen size/window scaling
+    int fontSize = determineFontSize();
 	fonts.try_emplace(
         FontType::PLAYFAIR,
-        "assets/fonts/Playfair.ttf", 48
+        "assets/fonts/Playfair.ttf", fontSize
     );
     fonts.try_emplace(
         FontType::PRESS_START,
-        "assets/fonts/PressStartRegular.ttf", 32
+        "assets/fonts/PressStartRegular.ttf", fontSize
     );
 }
 

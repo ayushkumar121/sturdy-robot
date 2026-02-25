@@ -70,6 +70,14 @@ uint32_t Font::getSize() const {
 	return size;
 }
 
+float Font::getLineSpacing() const {
+	return lineSpacing;
+}
+
+void Font::setLineSpacing(float lineSpacing) {
+	this->lineSpacing = lineSpacing;
+}
+
 const Font::Face& Font::getFace(char ch) const {
 	return faces.at(ch); 
 }

@@ -6,6 +6,13 @@
 #include <string_view>
 
 namespace Basic {
+    struct IVec2 {
+        union {
+            struct {int x,y;};
+            int xy[2];
+        };
+    };
+
     struct Vec2 {
         union {
             struct {float x,y;};

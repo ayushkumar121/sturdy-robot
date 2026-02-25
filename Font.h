@@ -23,10 +23,14 @@ public:
 	~Font();
 
 	uint32_t getSize() const;
+
+	float getLineSpacing() const;
+	void setLineSpacing(float lineSpacing);
 	const Face& getFace(char ch) const;
 
 	Basic::Vec2 measureText(std::string_view text) const;
 private:
 	uint32_t size;
+	float lineSpacing = 1.25f;
 	std::unordered_map<char, Face> faces;
 };

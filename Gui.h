@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <stack>
 #include <GLFW/glfw3.h>
 #include <string>
 
@@ -12,16 +13,23 @@
 
 class Gui {
 public:
-	void begin(GLFWwindow *window);
+	Gui();
+
+	void begin();
 	void end();
 
+	void scrollBegin(int x, int y, int width, int height);
+	void scrollEnd();
 	void text(std::string_view text, Basic::Vec4 rect, Basic::Color color);
 	bool button(std::string_view label, Basic::Vec2 pos);
 private:
-	void submitGlyphs(std::string_view text, Basic::Vec2 pos, Basic::Color color);
+	GLFWwindow *window;
+	const Font* font;
 
-	GLFWwindow *window = nullptr;
-	const Font* font = nullptr;
-	Renderer renderer;
-	TextRenderer textRenderer;
+	Renderer renderer{};
+	TextRenderer textRenderer{};
+	Basic::IVec2 frameSize{};
+	Basic::Vec2 mouse{};
+
+	float offsetY = 0.0f;
 };

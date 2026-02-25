@@ -10,7 +10,7 @@ void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity
                           const void * user_param);
 void updateFrame(GLFWwindow *window);
 
-Game game;
+static Game* game;
 
 int main() {
     // TODO: Abtract away window creation
@@ -54,6 +54,9 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    game = new Game();
+    glfwSetWindowUserPointer(window, game);
+
     while (!glfwWindowShouldClose(window)) {
         updateFrame(window);
         glfwPollEvents();
@@ -76,9 +79,9 @@ void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity
 }
 
 void updateFrame(GLFWwindow *window) {
-    game.update(window);
+    game->update(window);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    game.render(window);
+    game->render(window);
     glfwSwapBuffers(window);
 }
