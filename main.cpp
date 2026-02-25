@@ -1,19 +1,15 @@
 #include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
-#include <format>
 
 #include "Basic.h"
 #include "Renderer.h"
 #include "Texture.h"
 #include "TextureLibrary.h"
 #include "Font.h"
+#include "FontLibrary.h"
 #include "Gui.h"
 #include "TextRenderer.h"
-
-std::vector<Renderer::Quad> quads;
-Font* font;
-Font* font2;
 
 void frameBufferResizeCallback(GLFWwindow *window, int width, int height);
 void eventHandler(GLFWwindow *window);
@@ -23,7 +19,7 @@ void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity
 void renderFrame(GLFWwindow *window);
 
 int main() {
-    // Abtract away window creation
+    // TODO: Abtract away window creation
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
@@ -63,17 +59,6 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Loading textures
-    TextureLibrary& textureLib = TextureLibrary::getInstance();
-    Texture& tex1 = textureLib.getTexture("assets/wall.jpg");
-    Texture& tex2 = textureLib.getTexture("assets/awesomeface.png");
-
-    quads.emplace_back(Basic::Vec4{0.0f, 0.0f, 400.0f, 400.0f}, Basic::hexColor(0xFFFFFFFF), &tex1);
-    quads.emplace_back(Basic::Vec4{300.0f, 0.0f, 100.0f, 100.0f}, Basic::hexColor(0xFFFFFFFF), &tex2);
-    quads.emplace_back(Basic::Vec4{50.0f, 50.0f, 60.0f, 60.0f}, Basic::hexColor(0xFF00FF00), nullptr);
-
-    font = new Font("assets/Playfair.ttf", 48);
-    font2 = new Font("assets/SourceCodePro.ttf", 48);
     std::cout << "Starting main loop" << std::endl;
 
     while (!glfwWindowShouldClose(window)) {
@@ -117,30 +102,37 @@ void renderFrame(GLFWwindow *window) {
     Renderer renderer;
     renderer.begin(screenRect);
 
-    // Texture& tex4 = TextureLibrary::getInstance().getTexture("assets/office.jpg");
-    // Renderer::Quad background{screenRect, Basic::hexColor(0xFFFFFFFF), &tex4};
-    // renderer.submit(background);
+    Texture& tex4 = TextureLibrary::getInstance().getTexture("assets/officedark.jpg");
+    Renderer::Quad background{screenRect, Basic::hexColor(0xFFFFFFFF), &tex4};
+    renderer.submit(background);
 
-    for (auto &quad : quads) {
-        renderer.submit(quad);
-    }
+    Texture& tex1 = TextureLibrary::getInstance().getTexture("assets/VN_Visiter_C.png");
+    float characterHeight = (float)frameHeight;
+    float characterWidth = (characterHeight/tex1.getHeight()) * tex1.getWidth();
+    Renderer::Quad character{{0.0f, 0.0f, characterWidth, characterHeight}, Basic::hexColor(0xFFFFFFFF), &tex1};
+    renderer.submit(character);
+
+    Renderer::Quad panel{{0.0f, 3.0f*(float)frameHeight/4.0f, (float)frameWidth, (float)frameHeight/4.0f}, Basic::hexColor(0x55FFFFFF), nullptr};
+    renderer.submit(panel);
+
     renderer.end();
 
+    const Font& font = FontLibrary::getInstance().getFont(FontLibrary::FontType::PLAYFAIR);
+
     TextRenderer textRenderer;
-    textRenderer.begin(font, screenRect);
+    textRenderer.begin(&font, screenRect);
     std::string str = "In a hole in the ground there lived a hobbit.\n"
     "Not a nasty, dirty, wet hole, filled with the ends of worms and an oozy smell,\n"
     "nor yet a dry, bare, sandy hole with nothing in it to sit down on or to eat:\n"
     "it was a hobbit- hole, and that means comfort.";
 
-    // textRenderer.submit({"Hello World", {(float)frameWidth/2, (float)frameHeight/2}, Basic::hexColor(0xFF00FF00)});
-    textRenderer.submit({str, {600.0f, 600.0f}, Basic::hexColor(0xFFAAFFBB)});
+    textRenderer.submit({str, {100.0f, 100.0f + 3.0f*(float)frameHeight/4.0f}, Basic::hexColor(0xFF000000)});
     textRenderer.end();
 
     // GUI Layer
     Gui gui;
-    gui.begin(window, font2);
-    if (gui.button("Hello Worldg", {(float)frameWidth/2.0f, (float)frameHeight/2.0f})) {
+    gui.begin(window);
+    if (gui.button("Next", {3.0f*(float)frameWidth/4.0f, frameHeight - 100.0f})) {
         static int times = 0;
         std::cout << "Clicked " << times++ << std::endl;
     }

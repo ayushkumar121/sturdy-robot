@@ -15,11 +15,11 @@ public:
 		Basic::Color color;
 	};
 
-	void begin(Font* font, Basic::Vec4 rect);
+	void begin(const Font* font, Basic::Vec4 rect);
 	void submit(Text text);
 	void end();
 private:
-	Font* font = nullptr;
+	const Font* font = nullptr;
 	std::vector<Text> drawList;
 	Basic::Mat4 projection;
 };

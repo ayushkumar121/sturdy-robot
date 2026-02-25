@@ -12,7 +12,7 @@ else
     CXX_LIBS=-lglfw -lGL -lm
 endif
 
-SRC := main.cpp Basic.cpp Texture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp QuadMesh.cpp Renderer.cpp Gui.cpp Font.cpp TextRenderer.cpp
+SRC := main.cpp Basic.cpp Texture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp QuadMesh.cpp Renderer.cpp Gui.cpp Font.cpp FontLibrary.cpp TextRenderer.cpp
 
 all: $(PROJECT_NAME)
 

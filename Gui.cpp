@@ -2,17 +2,16 @@
 #include "Gui.h"
 
 #include <cassert>
-
-const
+#include "FontLibrary.h"
 
 static inline bool insideRect(Basic::Vec2 point, Basic::Vec4 rect) {
     return (point.x >= rect.x && point.x <= (rect.x+rect.z) && 
             point.y >= rect.y && point.y <= (rect.y+rect.w));
 }
 
-void Gui::begin(GLFWwindow *window, Font *font) {
+void Gui::begin(GLFWwindow *window) {
 	this->window = window;
-    this->font = font;
+    this->font = &FontLibrary::getInstance().getFont(FontLibrary::FontType::PRESS_START);
 
     // GUI starts a full screen rendering
     int frameWidth, frameHeight;

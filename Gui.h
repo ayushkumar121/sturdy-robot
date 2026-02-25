@@ -12,13 +12,13 @@
 
 class Gui {
 public:
-	void begin(GLFWwindow *window, Font *font);
+	void begin(GLFWwindow *window);
 	void end();
 
 	bool button(std::string label, Basic::Vec2 pos);
 private:
 	GLFWwindow *window = nullptr;
-	Font* font = nullptr;
+	const Font* font = nullptr;
 	Renderer renderer;
 	TextRenderer textRenderer;
 };

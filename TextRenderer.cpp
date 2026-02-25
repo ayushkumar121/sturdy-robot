@@ -6,7 +6,7 @@
 #include "ShaderLibrary.h"
 #include "QuadMesh.h"
 
-void TextRenderer::begin(Font* font, Basic::Vec4 rect) {
+void TextRenderer::begin(const Font* font, Basic::Vec4 rect) {
 	this->font = font;
 	this->projection = Basic::Mat4::projection(rect.x, rect.y, rect.z, rect.w);
 	drawList.clear();
