@@ -3,6 +3,8 @@
 
 #include "FontLibrary.h"
 
+constexpr float lineSpacing = 1.25f;
+
 static bool insideRect(Basic::Vec2 point, Basic::Vec4 rect) {
     return (point.x >= rect.x && point.x <= (rect.x+rect.z) && 
             point.y >= rect.y && point.y <= (rect.y+rect.w));
@@ -10,7 +12,7 @@ static bool insideRect(Basic::Vec2 point, Basic::Vec4 rect) {
 
 void Gui::begin(GLFWwindow *window) {
 	this->window = window;
-    this->font = &FontLibrary::getInstance().getFont(FontLibrary::FontType::PRESS_START);
+    this->font = &FontLibrary::getInstance().getFont(FontLibrary::FontType::PLAYFAIR);
 
     // GUI starts a full screen rendering
     int frameWidth, frameHeight;
@@ -28,14 +30,20 @@ void Gui::end() {
 
 void Gui::submitGlyphs(std::string_view text, Basic::Vec2 pos, Basic::Color color) {
 	float offsetX = 0.0f;
+	float offsetY = 0.0f;
 	for (auto ch : text) {
+		if (ch == '\n') {
+			offsetX = 0.0f;
+			offsetY += font->getSize() * lineSpacing;
+			continue;
+		}
 		const Font::Face& face = font->getFace(ch);
 		if (face.textureId == 0) {
 			offsetX += face.advance >> 6;
 			continue;
 		}
 		float glyphX = pos.x + offsetX + face.bearingX;
-		float glyphY = pos.y - face.bearingY;
+		float glyphY = pos.y + offsetY - face.bearingY;
 		textRenderer.submit({face.textureId, {glyphX, glyphY}, {(float)face.width, (float)face.height}, color});
 		offsetX += face.advance >> 6;
 	}
@@ -57,7 +65,7 @@ void Gui::text(std::string_view text, Basic::Vec4 rect, Basic::Color color) {
 
 			if (xPos + textSize.x > rect.x + rect.z) {
 				xPos = rect.x;
-				yPos += textSize.y;
+				yPos += font->getSize() * lineSpacing;
 			}
 
 			submitGlyphs(word, {xPos, yPos}, color);
@@ -74,7 +82,7 @@ void Gui::text(std::string_view text, Basic::Vec4 rect, Basic::Color color) {
 
 		if (xPos + textSize.x > rect.x + rect.z) {
 			xPos = rect.x;
-			yPos += textSize.y;
+			yPos += font->getSize() * lineSpacing;
 		}
 
 		submitGlyphs(word, {xPos, yPos}, color);

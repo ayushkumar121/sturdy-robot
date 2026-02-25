@@ -38,7 +38,7 @@ void Game::render(GLFWwindow* window) {
         Renderer::Quad character{{0.0f, 0.0f, characterWidth, characterHeight}, Basic::hexColor(0xFFFFFFFF), &tex1};
         renderer.submit(character);
 
-        Basic::Vec4 panelRect = {0.0f, 3.0f * frameRect.w / 4.0f, frameRect.z, frameRect.w / 4.0f};
+        Basic::Vec4 panelRect = {0.0f, 2.0f * frameRect.w / 3.0f, frameRect.z, frameRect.w / 3.0f};
         Renderer::Quad panel{panelRect, Basic::hexColor(0x55FFFFFF), nullptr};
         renderer.submit(panel);
         renderer.end();
