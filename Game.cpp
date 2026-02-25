@@ -2,11 +2,7 @@
 
 #include "Game.h"
 
-#include <iostream>
-
 #include "Renderer.h"
-#include "TextRenderer.h"
-#include "FontLibrary.h"
 #include "TextureLibrary.h"
 #include "Gui.h"
 
@@ -50,7 +46,9 @@ void Game::render(GLFWwindow* window) {
         // GUI Layer
         Gui gui;
         gui.begin(window);
-        gui.text(dialogue.text, panelRect, Basic::hexColor(0xFF000000));
+        float padding = 20.0f;
+        Basic::Vec4 textRect = {panelRect.x + padding, panelRect.y + padding, panelRect.z - 2 * padding, panelRect.w - 2 * padding };
+        gui.text(dialogue.text, textRect, Basic::hexColor(0xFF000000));
         if (gui.button("Next", {frameRect.z - 200.0f, frameRect.w - 100.0f})) {
             storyEngine.advance();
         }

@@ -18,6 +18,8 @@ public:
 	void text(std::string_view text, Basic::Vec4 rect, Basic::Color color);
 	bool button(std::string_view label, Basic::Vec2 pos);
 private:
+	void submitGlyphs(std::string_view text, Basic::Vec2 pos, Basic::Color color);
+
 	GLFWwindow *window = nullptr;
 	const Font* font = nullptr;
 	Renderer renderer;

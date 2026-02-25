@@ -6,14 +6,13 @@
 #include "ShaderLibrary.h"
 #include "QuadMesh.h"
 
-void TextRenderer::begin(const Font* font, Basic::Vec4 rect) {
-	this->font = font;
+void TextRenderer::begin(Basic::Vec4 rect) {
 	this->projection = Basic::Mat4::projection(rect.x, rect.y, rect.z, rect.w);
 	drawList.clear();
 }
 
-void TextRenderer::submit(Text text) {
-	drawList.push_back(text);
+void TextRenderer::submit(Glyph glyph) {
+	drawList.push_back(glyph);
 }
 
 void TextRenderer::end() {
@@ -23,35 +22,17 @@ void TextRenderer::end() {
     shader.setValue("projection", projection);
     shader.setValue("tex", 0);
 
-    for (const Text& text : drawList) {
-	    float offsetX = 0.0f;
-	    float offsetY = 0.0f;
-	    for (auto& ch: text.data) {
-	    	const Font::Face& face = font->getFace(ch);
-			if (face.textureId == 0) {
-				offsetX += face.advance >> 6;
-				continue;
-			}
-			
-	    	if (ch == '\n') {
-	    		offsetY += face.height + face.bearingY;
-	    		offsetX = 0.0f;
-	    		continue;
-	    	}
+    for (const Glyph& glyph : drawList) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, glyph.textureId);
 
-	    	glActiveTexture(GL_TEXTURE0);
-	   		glBindTexture(GL_TEXTURE_2D, face.textureId);
+        auto transform = Basic::Mat4::identity()
+            * Basic::Mat4::translate(glyph.pos.x, glyph.pos.y, 0.0f)
+            * Basic::Mat4::scale(glyph.size.x, glyph.size.y, 1.0f);
 
-	    	auto transform = Basic::Mat4::identity()
-            * Basic::Mat4::translate(offsetX + text.pos.x + face.bearingX, offsetY + text.pos.y - face.bearingY, 0.0f)
-            * Basic::Mat4::scale(face.width, face.height, 1.0f);
+        shader.setValue("transform", transform);
+        shader.setValue("color", glyph.color);
 
-	        shader.setValue("transform", transform);
-	        shader.setValue("color", text.color);
-
-	        offsetX += face.advance >> 6;
-
-	        QuadMesh::getInstance().draw();
-	    }
+        QuadMesh::getInstance().draw();
     }
 }
