@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "Basic.h"
@@ -10,7 +11,7 @@
 class TextRenderer {
 public:
 	struct Text {
-		std::string data;
+		std::string_view data;
 		Basic::Vec2 pos;
 		Basic::Color color;
 	};

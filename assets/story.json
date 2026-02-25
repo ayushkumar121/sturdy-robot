@@ -1,0 +1,39 @@
+{
+  "scenes": [
+    {
+      "id": "intro_01",
+      "dialogues": [
+        {
+          "speaker": "player",
+          "text": "You are nervously waiting in an office lobby looking around, everyone seems busy. They are all glued to their screen typing furiously as if they are angrily writing to someone, in a way they were.",
+          "spritePath": "assets/characters/VN_Visiter_A--Broad_Smile.png",
+          "backgroundPath": "assets/backgrounds/offcedark.jpg"
+        },
+        {
+          "speaker": "player",
+          "text": "Finally, after much waiting for your boss @boss comes around, he looks like one of those overconfident people in high school who have never faced any consequences in their life. He had perfect well combed hair and a black suit and underneath he was wearing a well ironed white shirt.",
+          "spritePath": "assets/characters/VN_Visiter_A--Broad_Smile.png",
+          "backgroundPath": "assets/backgrounds/officedark.jpg"
+        },
+        {
+          "speaker": "boss",
+          "text": "Hi @player, how are you doing?",
+          "spritePath": "assets/characters/VN_Visiter_C.png",
+          "backgroundPath": "assets/backgrounds/officedark.jpg"
+        }
+      ],
+      "choices": [
+        {
+          "label": "Never been better",
+          "nextSceneId": "intro_02"
+        },
+        {
+          "label": "I’m quite nervous actually",
+          "nextSceneId": "intro_03"
+        }
+      ],
+      "nextSceneId": null,
+      "setFlags": {}
+    }
+  ]
+}

@@ -12,15 +12,12 @@ else
     CXX_LIBS=-lglfw -lGL -lm
 endif
 
-SRC := main.cpp Basic.cpp Texture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp QuadMesh.cpp Renderer.cpp Gui.cpp Font.cpp FontLibrary.cpp TextRenderer.cpp
+SRC := main.cpp Basic.cpp Texture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp QuadMesh.cpp Renderer.cpp Gui.cpp Font.cpp FontLibrary.cpp TextRenderer.cpp StoryEngine.cpp Game.cpp
 
 all: $(PROJECT_NAME)
 
-$(PROJECT_NAME): $(SRC) gl.o stb_image.o game.o
-	$(CXX) -o $(PROJECT_NAME) $(SRC) gl.o stb_image.o game.o $(CXX_FLAGS) $(CXX_LIBS) $(LIB_FREETYPE_FLAGS) $(LIB_FREETYPE_LIBS)
-
-game.o: Game.cpp
-	$(CXX) -c -o game.o Game.cpp  $(CXX_FLAGS)
+$(PROJECT_NAME): $(SRC) gl.o stb_image.o
+	$(CXX) -o $(PROJECT_NAME) $(SRC) gl.o stb_image.o $(CXX_FLAGS) $(CXX_LIBS) $(LIB_FREETYPE_FLAGS) $(LIB_FREETYPE_LIBS)
 
 gl.o: vender/glad/src/gl.c
 	$(CC) -c -o gl.o vender/glad/src/gl.c -Ivender/glad/include 

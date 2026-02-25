@@ -15,7 +15,8 @@ public:
 	void begin(GLFWwindow *window);
 	void end();
 
-	bool button(std::string label, Basic::Vec2 pos);
+	void text(std::string_view text, Basic::Vec4 rect, Basic::Color color);
+	bool button(std::string_view label, Basic::Vec2 pos);
 private:
 	GLFWwindow *window = nullptr;
 	const Font* font = nullptr;

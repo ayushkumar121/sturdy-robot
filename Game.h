@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "StoryEngine.h"
+
 class Game {
 public:
 	Game();
@@ -11,4 +13,5 @@ public:
 	void update(GLFWwindow* window);
 	void render(GLFWwindow* window);
 private:
+	StoryEngine storyEngine;
 };

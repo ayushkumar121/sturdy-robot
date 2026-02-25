@@ -9,17 +9,17 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-Font::Font(std::string_view fontPath, uint32_t size) {
+Font::Font(std::string_view fontPath, uint32_t size) : size(size) {
 	FT_Library ft;
 	if (FT_Init_FreeType(&ft)) {
-		throw std::runtime_error("failed initilize freeType");
+		throw std::runtime_error("failed initialize freeType");
 	}
 
 	FT_Face face;
 	if (FT_New_Face(ft, fontPath.data(), 0, &face)) {
 		throw std::runtime_error("failed to load font");
 	}
-	
+
 	FT_Set_Pixel_Sizes(face, 0, size);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
