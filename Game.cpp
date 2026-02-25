@@ -58,7 +58,7 @@ void Game::render(GLFWwindow* window) {
     // GUI Layer
     Gui gui;
     gui.begin(window);
-    if (gui.button("Next", {3.0f*(float)frameWidth/4.0f, frameHeight - 100.0f})) {
+    if (gui.button("Next", {(float)frameWidth - 200.0f, (float)frameHeight - 100.0f})) {
         static int times = 0;
         std::cout << "Clicked " << times++ << std::endl;
     }

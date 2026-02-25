@@ -8,11 +8,11 @@ FontLibrary::FontLibrary() {
 	// TODO: make the sizes based on screen size/window scaling
 	fonts.try_emplace(
         FontType::PLAYFAIR,
-        "assets/fonts/Playfair.ttf", 60
+        "assets/fonts/Playfair.ttf", 32
     );
     fonts.try_emplace(
         FontType::PRESS_START,
-        "assets/fonts/PressStartRegular.ttf", 48
+        "assets/fonts/PressStartRegular.ttf", 32
     );
 }
 
