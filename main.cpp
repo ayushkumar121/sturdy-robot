@@ -2,21 +2,15 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
-#include "Basic.h"
-#include "Renderer.h"
-#include "Texture.h"
-#include "TextureLibrary.h"
-#include "Font.h"
-#include "FontLibrary.h"
-#include "Gui.h"
-#include "TextRenderer.h"
+#include "Game.h"
 
 void frameBufferResizeCallback(GLFWwindow *window, int width, int height);
-void eventHandler(GLFWwindow *window);
 void errorCallback(int error, const char *description);
 void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar * message,
                           const void * user_param);
-void renderFrame(GLFWwindow *window);
+void updateFrame(GLFWwindow *window);
+
+Game game;
 
 int main() {
     // TODO: Abtract away window creation
@@ -54,16 +48,13 @@ int main() {
     glViewport(0, 0, frameWidth, frameHeight);
 
     glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
-    glfwSetWindowRefreshCallback(window, renderFrame);
+    glfwSetWindowRefreshCallback(window, updateFrame);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    std::cout << "Starting main loop" << std::endl;
-
     while (!glfwWindowShouldClose(window)) {
-        eventHandler(window);
-        renderFrame(window);
+        updateFrame(window);
         glfwPollEvents();
     }
 
@@ -75,11 +66,6 @@ void frameBufferResizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void eventHandler(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
 void errorCallback(int error, const char *description) {
     std::cerr << "GLFW Error: " << description << std::endl;
 }
@@ -88,55 +74,10 @@ void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity
     std::cout <<"GL Message: " << message << std::endl;
 }
 
-void renderFrame(GLFWwindow *window) {
+void updateFrame(GLFWwindow *window) {
+    game.update(window);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    // Basic::getScreenRect
-    int frameWidth, frameHeight;
-    glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
-
-    Basic::Vec4 screenRect{0.0f, 0.0f, (float)frameWidth, (float)frameHeight};
- 
-    // Normal Rendering
-    Renderer renderer;
-    renderer.begin(screenRect);
-
-    Texture& tex4 = TextureLibrary::getInstance().getTexture("assets/officedark.jpg");
-    Renderer::Quad background{screenRect, Basic::hexColor(0xFFFFFFFF), &tex4};
-    renderer.submit(background);
-
-    Texture& tex1 = TextureLibrary::getInstance().getTexture("assets/VN_Visiter_C.png");
-    float characterHeight = (float)frameHeight;
-    float characterWidth = (characterHeight/tex1.getHeight()) * tex1.getWidth();
-    Renderer::Quad character{{0.0f, 0.0f, characterWidth, characterHeight}, Basic::hexColor(0xFFFFFFFF), &tex1};
-    renderer.submit(character);
-
-    Renderer::Quad panel{{0.0f, 3.0f*(float)frameHeight/4.0f, (float)frameWidth, (float)frameHeight/4.0f}, Basic::hexColor(0x55FFFFFF), nullptr};
-    renderer.submit(panel);
-
-    renderer.end();
-
-    const Font& font = FontLibrary::getInstance().getFont(FontLibrary::FontType::PLAYFAIR);
-
-    TextRenderer textRenderer;
-    textRenderer.begin(&font, screenRect);
-    std::string str = "In a hole in the ground there lived a hobbit.\n"
-    "Not a nasty, dirty, wet hole, filled with the ends of worms and an oozy smell,\n"
-    "nor yet a dry, bare, sandy hole with nothing in it to sit down on or to eat:\n"
-    "it was a hobbit- hole, and that means comfort.";
-
-    textRenderer.submit({str, {100.0f, 100.0f + 3.0f*(float)frameHeight/4.0f}, Basic::hexColor(0xFF000000)});
-    textRenderer.end();
-
-    // GUI Layer
-    Gui gui;
-    gui.begin(window);
-    if (gui.button("Next", {3.0f*(float)frameWidth/4.0f, frameHeight - 100.0f})) {
-        static int times = 0;
-        std::cout << "Clicked " << times++ << std::endl;
-    }
-    gui.end();
-
+    game.render(window);
     glfwSwapBuffers(window);
 }
