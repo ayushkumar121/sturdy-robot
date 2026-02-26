@@ -4,7 +4,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Gui.h"
 #include "StoryEngine.h"
 
 class Game {
@@ -14,5 +13,4 @@ public:
 	void render(GLFWwindow* window);
 private:
 	StoryEngine storyEngine;
-	Gui gui;
 };

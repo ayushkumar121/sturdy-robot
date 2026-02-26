@@ -23,7 +23,7 @@ int main() {
     glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow *window = glfwCreateWindow(1920, 1080, "Game", glfwGetPrimaryMonitor(), nullptr);
+    GLFWwindow *window = glfwCreateWindow(1920, 1080, "Game", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;

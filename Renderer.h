@@ -15,7 +15,7 @@ public:
         Texture* texture;
     };
 
-    void begin(Basic::Vec4 rect);
+    void begin(Basic::Vec2 frameSize);
     void submit(Quad& quad);
     void end();
     void clear();
