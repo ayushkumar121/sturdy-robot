@@ -1,7 +1,7 @@
 PROJECT_NAME=game
 CXX=g++
 CC=gcc
-CXX_FLAGS=-Wall -Wno-missing-braces -g -std=c++23 -Ivender/glad/include -Ivender/stb -Ivender/glfw/include
+CXX_FLAGS=-Wall -Wno-missing-braces -Wno-deprecated-declarations -g -std=c++23 -Ivender/glad/include -Ivender/stb -Ivender/glfw/include
 LIB_FREETYPE_FLAGS=$(shell pkg-config --cflags freetype2)
 LIB_FREETYPE_LIBS=$(shell pkg-config --libs freetype2)
 UNAME_S := $(shell uname -s)

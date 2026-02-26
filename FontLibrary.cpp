@@ -11,11 +11,15 @@ static int determineFontSize() {
     int frameWidth, frameHeight;
     glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
 
-    return frameHeight/30;
+    return frameHeight/45;
 }
 
 FontLibrary::FontLibrary() {
     int fontSize = determineFontSize();
+    fonts.try_emplace(
+        FontType::ROBOTO,
+        "assets/fonts/Roboto.ttf", fontSize
+    );
 	fonts.try_emplace(
         FontType::PLAYFAIR,
         "assets/fonts/Playfair.ttf", fontSize

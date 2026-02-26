@@ -53,8 +53,8 @@ void Game::render(GLFWwindow* window) {
                 gui.text(dialogue.text, textRect, Basic::hexColor(0xFF000000));
             }
             gui.scrollEnd();
-
-            if (gui.button("Next", {frameRect.z - 500.0f, frameRect.w - 100.0f})) {
+            
+            if (gui.button("Next", {frameRect.z * 0.9f, frameRect.w * 0.9f})) {
                 storyEngine.advance();
             }
         }

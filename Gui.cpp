@@ -1,11 +1,15 @@
 // Created by ari on 2/23/26.
 #include "Gui.h"
 
+#include <iostream>
 #include <algorithm>
 
 #include "FontLibrary.h"
 
+// GUI Config
 const float buttonPadding = 20.0f;
+const float scrollSpeed = 40.0f;
+
 static float scrollDelta = 0.0f;
 
 static bool insideRect(Basic::Vec2 point, Basic::Vec4 rect) {
@@ -19,7 +23,7 @@ static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
 
 Gui::Gui() {
     this->window = glfwGetCurrentContext();
-    this->font = &FontLibrary::getInstance().getFont(FontLibrary::FontType::PLAYFAIR);
+    this->font = &FontLibrary::getInstance().getFont(FontLibrary::FontType::ROBOTO);
     glfwSetScrollCallback(window, scrollCallback);
 }
 
@@ -47,9 +51,74 @@ void Gui::end() {
     scrollDelta = 0;
 }
 
+void Gui::scrollBegin(int x, int y, int width, int height) {
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(x, frameSize.y - (y + height), width, height);
+
+    scrollRect = {(float)x, (float)y, (float)width, (float)height};
+
+    if (insideRect(mouse, scrollRect)) {
+        offsetY += scrollDelta * scrollSpeed;
+        offsetY = std::min(0.0f, offsetY);
+    }
+
+    Renderer::Quad scrollBackground{scrollRect, Basic::hexColor(0x55FFFFFF), nullptr};
+    renderer.submit(scrollBackground);
+}
+
+void Gui::scrollEnd() {
+    renderer.end();
+    renderer.clear();
+    textRenderer.end();
+    textRenderer.clear();
+    scrollDelta = 0;
+    scrollRect = {};
+    glDisable(GL_SCISSOR_TEST);
+}
+
+float Gui::measureTextHeight(std::string_view text, Basic::Vec4 rect) {
+    size_t start = 0;
+    size_t end = 0;
+
+    float xPos = 0.0;
+    float yPos = font->getSize();
+
+    for (const auto c: text) {
+        if (c != ' ') {
+            end++;
+        } else {
+            std::string_view word = text.substr(start, end - start + 1);
+            Basic::Vec2 textSize = font->measureText(word);
+
+            if (xPos + textSize.x > rect.x + rect.z) {
+                xPos = rect.x;
+                yPos += font->getSize() * font->getLineSpacing();
+            }
+            xPos += textSize.x;
+            start = ++end;
+        }
+    }
+
+    if (start < text.size()) {
+        std::string_view word = text.substr(start, end - start);
+        Basic::Vec2 textSize = font->measureText(word);
+
+        if (xPos + textSize.x > rect.x + rect.z) {
+            xPos = rect.x;
+            yPos += font->getSize() * font->getLineSpacing();
+        }
+    }
+
+    return yPos;
+}
+
 void Gui::text(std::string_view text, Basic::Vec4 rect, Basic::Color color) {
     size_t start = 0;
     size_t end = 0;
+
+    // Kind of a hack
+    float textContentHeight = measureTextHeight(text, rect);
+    offsetY = std::max(offsetY, -textContentHeight);
 
     float xPos = rect.x;
     float yPos = rect.y + font->getSize() + offsetY;
@@ -68,9 +137,7 @@ void Gui::text(std::string_view text, Basic::Vec4 rect, Basic::Color color) {
 
             textRenderer.submit({word, {xPos, yPos}, color});
             xPos += textSize.x;
-
-            end++;
-            start = end;
+            start = ++end;
         }
     }
 
@@ -87,30 +154,11 @@ void Gui::text(std::string_view text, Basic::Vec4 rect, Basic::Color color) {
     }
 }
 
-void Gui::scrollBegin(int x, int y, int width, int height) {
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(x, frameSize.y - (y + height), width, height);
-
-    Basic::Vec4 rect = {(float)x, (float)y, (float)width, (float)height};
-
-    if (insideRect(mouse, rect)) {
-        offsetY += scrollDelta * 50.0f;
+bool Gui::button(std::string_view label, Basic::Vec2 pos) {
+    if (scrollRect.y > 0.0f) {
+        pos.y += offsetY;
     }
 
-    Renderer::Quad panel{rect, Basic::hexColor(0x55FFFFFF), nullptr};
-    renderer.submit(panel);
-}
-
-void Gui::scrollEnd() {
-    renderer.end();
-    renderer.clear();
-    textRenderer.end();
-    textRenderer.clear();
-    scrollDelta = 0;
-    glDisable(GL_SCISSOR_TEST);
-}
-
-bool Gui::button(std::string_view label, Basic::Vec2 pos) {
     int windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
 

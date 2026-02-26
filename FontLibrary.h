@@ -9,6 +9,7 @@
 class FontLibrary {
 public:
 	enum class FontType {
+		ROBOTO,
 		PLAYFAIR,
 		PRESS_START
 	};
