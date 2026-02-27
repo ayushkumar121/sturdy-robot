@@ -13,25 +13,24 @@
 
 class Gui {
 public:
-	struct Content {
-		Basic::Vec4 rect{};
+	struct ContentState {
+		int id;
+		Basic::Vec4 rect{}; // absolute world coordinates
 		Basic::Vec2 cursor{};
-		float scrollY = 0.0f;
+		std::vector<Renderer::Quad> quads;
+		std::vector<TextRenderer::Text> texts;
 	};
 
 	Gui();
+	~Gui();
 
-	void begin(Basic::Vec4 rect);
+	void begin(Basic::Vec2 size);
 	void end();
 
-	// void scrollBegin(int x, int y, int width, int height);
-	// void scrollEnd();
 	void text(std::string_view text, Basic::Color color);
 	bool button(std::string_view label);
 private:
-	Basic::Vec2 transform(Basic::Vec2 point);
-	Basic::Vec4 transform(Basic::Vec4 rect);
-
+	int id = 0;
 	GLFWwindow *window;
 	const Font* font;
 
@@ -39,7 +38,9 @@ private:
 	TextRenderer textRenderer{};
 	Basic::Vec2 frameSize{};
 	Basic::Vec2 mouse{};
-	std::vector<Content> contentStack{};
+	std::vector<ContentState> contentStack{};
+	int currenStateIndex = -1;
 
-	float offsetY = 0.0f;
+	Basic::Vec2 transform(const Basic::Vec2 point);
+	ContentState& getCurrentState();
 };

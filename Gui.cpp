@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <unordered_map>
 
 #include "FontLibrary.h"
 
@@ -12,47 +13,11 @@ const float SCROLL_SPEED = 40.0f;
 const float MARGIN = 15.0f;
 
 static float scrollDelta = 0.0f;
+static std::unordered_map<int, float> scrollData;
 
 static bool insideRect(Basic::Vec2 point, Basic::Vec4 rect) {
     return (point.x >= rect.x && point.x <= (rect.x + rect.z) &&
             point.y >= rect.y && point.y <= (rect.y + rect.w));
-}
-
-// If words wrap then what would be the height
-static float measureTextHeight(const Font* font, std::string_view text, float x, float width)  {
-    size_t start = 0;
-    size_t end = 0;
-
-    float xPos = x;
-    float yPos = font->getSize();
-
-    for (const auto c: text) {
-        if (c != ' ') {
-            end++;
-        } else {
-            std::string_view word = text.substr(start, end - start + 1);
-            Basic::Vec2 textSize = font->measureText(word);
-
-            if (xPos + textSize.x > x + width) {
-                xPos = x;
-                yPos += font->getSize() * font->getLineSpacing();
-            }
-            xPos += textSize.x;
-            start = ++end;
-        }
-    }
-
-    if (start < text.size()) {
-        std::string_view word = text.substr(start, end - start);
-        Basic::Vec2 textSize = font->measureText(word);
-
-        if (xPos + textSize.x > x + width) {
-            xPos = x;
-            yPos += font->getSize() * font->getLineSpacing();
-        }
-    }
-
-    return yPos;
 }
 
 static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
@@ -76,71 +41,84 @@ Gui::Gui() {
 
     mouse.x = (float) mouseX * (frameSize.x / (float) windowWidth);
     mouse.y = (float) mouseY * (frameSize.y / (float) windowHeight);
+
+    // renderer.begin(frameSize);
+    // textRenderer.begin(font, frameSize);
 }
 
-void Gui::begin(Basic::Vec4 rect) {
+Gui::~Gui() {
     glEnable(GL_SCISSOR_TEST);
-    glScissor((int)rect.x, (int)(frameSize.y - (rect.y + rect.w)), (int)rect.z, (int)rect.w);
+    // Drawing front to back
+    while(!contentStack.empty()) {
+        ContentState& state = contentStack.front();
+        glScissor((int)state.rect.x, (int)(frameSize.y - (state.rect.y + state.rect.w)), (int)state.rect.z, (int)state.rect.w);
+        
+        renderer.begin(frameSize);
+        for (auto quad : state.quads) {
+            renderer.submit(quad);
+        }
+        renderer.end();
 
-    Content content;
-    content.rect = rect;
-    content.cursor = {0.0f, 0.0f};
-
-    renderer.begin(frameSize);
-    textRenderer.begin(font, frameSize);
-
-    contentStack.push_back(content);
-
-    if (insideRect(mouse, rect)) {
-        content.scrollY += scrollDelta * SCROLL_SPEED;
-        // content.scrollY = offsetY = std::min(0.0f, offsetY);
+        textRenderer.begin(font, frameSize);
+        for (auto text : state.texts) {
+            textRenderer.submit(text);
+        }
+        textRenderer.end();
+        contentStack.erase(contentStack.begin());
     }
+    glDisable(GL_SCISSOR_TEST);
+    scrollDelta = 0.0f;
+}
+
+void Gui::begin(Basic::Vec2 size) {
+    Basic::Vec4 rect;
+    if (currenStateIndex >= 0) {
+        ContentState& parent = getCurrentState();
+
+        float left   = parent.rect.x + parent.cursor.x;
+        float top    = parent.rect.y + parent.cursor.y + scrollData[parent.id];
+        float right  = std::min(parent.rect.x + parent.rect.z, left + size.x);
+        float bottom = std::min(parent.rect.y + parent.rect.w, top + size.y);
+
+        rect = {left, top, std::max(0.0f, right - left - MARGIN), std::max(0.0f, bottom - top - MARGIN)};
+        parent.cursor.y += size.y + MARGIN;
+    } else {
+        rect = {MARGIN, MARGIN, size.x - MARGIN, size.y - MARGIN};
+    }
+
+    ContentState state;
+    state.id = id++;
+    state.cursor = {MARGIN, MARGIN};
+    state.rect = rect;
+    state.quads.push_back(Renderer::Quad{rect, Basic::hexColor(0x55FFFFFF), nullptr});
+    contentStack.push_back(state);
+
+    currenStateIndex++;
 }
 
 void Gui::end() {
-    renderer.end();
-    textRenderer.end();
-    contentStack.pop_back();
-    glDisable(GL_SCISSOR_TEST);
-    scrollDelta = 0;
+    ContentState& state = getCurrentState();
+    if (insideRect(mouse, state.rect)) {
+        scrollData[state.id] += scrollDelta * SCROLL_SPEED;
+
+        float maxScroll = state.cursor.y - state.rect.w;
+        if (maxScroll < 0.0f) maxScroll = 0.0f;
+        scrollData[state.id] = std::clamp(scrollData[state.id], -maxScroll, 0.0f);
+        scrollDelta = 0;
+    }
+
+    currenStateIndex--;
 }
 
-// void Gui::scrollBegin(int x, int y, int width, int height) {
-//     glEnable(GL_SCISSOR_TEST);
-//     glScissor(x, frameSize.y - (y + height), width, height);
-//
-//     // scrollRect = {(float)x, (float)y, (float)width, (float)height};
-//     //
-//     // if (insideRect(mouse, scrollRect)) {
-//     //     offsetY += scrollDelta * SCROLL_SPEED;
-//     //     offsetY = std::min(0.0f, offsetY);
-//     // }
-//     //
-//     // Renderer::Quad scrollBackground{scrollRect, Basic::hexColor(0x55FFFFFF), nullptr};
-//     // renderer.submit(scrollBackground);
-// }
-//
-// void Gui::scrollEnd() {
-//     renderer.end();
-//     renderer.clear();
-//     textRenderer.end();
-//     textRenderer.clear();
-//     scrollDelta = 0;
-//     glDisable(GL_SCISSOR_TEST);
-// }
-
 void Gui::text(std::string_view text, Basic::Color color) {
-    Content& content = contentStack.back();
-    Basic::Vec2 pos = transform(content.cursor);
-    // Kind of a hack
-    // float textContentHeight = measureTextHeight(font, text, pos.x, content.contentSize.x);
-    // offsetY = std::max(offsetY, -textContentHeight);
+    ContentState& state = getCurrentState();
+    Basic::Vec2 pos = transform(state.cursor);
 
     size_t start = 0;
     size_t end = 0;
 
     float xPos = pos.x;
-    float yPos = pos.y + font->getSize();// + offsetY
+    float yPos = pos.y + font->getSize();
 
     for (const auto c: text) {
         if (c != ' ') {
@@ -149,12 +127,12 @@ void Gui::text(std::string_view text, Basic::Color color) {
             std::string_view word = text.substr(start, end - start + 1);
             Basic::Vec2 textSize = font->measureText(word);
 
-            if (xPos + textSize.x > pos.x + content.rect.z - MARGIN) {
+            if (xPos + textSize.x > pos.x + state.rect.z - MARGIN) {
                 xPos = pos.x;
                 yPos += font->getSize() * font->getLineSpacing();
             }
 
-            textRenderer.submit({word, {xPos, yPos}, color});
+            state.texts.push_back(TextRenderer::Text{word, {xPos, yPos}, color});
             xPos += textSize.x;
             start = ++end;
         }
@@ -164,81 +142,54 @@ void Gui::text(std::string_view text, Basic::Color color) {
         std::string_view word = text.substr(start, end - start);
         Basic::Vec2 textSize = font->measureText(word);
 
-        if (xPos + textSize.x > pos.x + content.rect.z - MARGIN) {
+        if (xPos + textSize.x > pos.x + state.rect.z - MARGIN) {
             xPos = pos.x;
             yPos += font->getSize() * font->getLineSpacing();
         }
 
-        textRenderer.submit({word, {xPos, yPos}, color});
+        state.texts.push_back(TextRenderer::Text{word, {xPos, yPos}, color});
     }
 
-    // Renderer::Quad quad{{pos.x, pos.y, content.contentSize.x, yPos - pos.y}, Basic::hexColor(0xFFFFFFFF), nullptr};
-    // renderer.submit(quad);
-
-    content.cursor.y = yPos + 2*MARGIN;
+    state.cursor.y += yPos - pos.y + 2*MARGIN;
 }
 
 bool Gui::button(std::string_view label) {
-    Content& content = contentStack.back();
-    Basic::Vec2 pos = transform(content.cursor);
+    ContentState& state = getCurrentState();
+    Basic::Vec2 pos = transform(state.cursor);
 
     Basic::Vec2 textSize = font->measureText(label);
     Basic::Vec4 rect = {pos.x, pos.y, textSize.x + 2 * PADDING, textSize.y + 2 * PADDING};
 
-    Basic::Color color = Basic::hexColor(0xFFFFFFFF);
-    Renderer::Quad quad(rect, color, nullptr);
-    renderer.submit(quad);
+    static int prevState = GLFW_RELEASE;
+    int newState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+    bool hovered = insideRect(mouse, rect);
+    bool mouseDown = newState == GLFW_PRESS && prevState == GLFW_RELEASE;
+    prevState = newState;
+
+    Basic::Vec4 color = hovered? 
+        (mouseDown ? Basic::hexColor(0xFFFF0000) : Basic::hexColor(0xFF00FF00))
+        : Basic::hexColor(0xFFFFFFFF);
+
+    state.quads.push_back(Renderer::Quad{rect, color, nullptr});
 
     float textX = pos.x + PADDING;
     float textY = pos.y + (rect.w + textSize.y) / 2.0f;
-    textRenderer.submit({label, {textX, textY}, Basic::hexColor(0xFF000000)});
+    state.texts.push_back(TextRenderer::Text{label, {textX, textY}, Basic::hexColor(0xFF000000)});
 
-    content.cursor.y += rect.w + 2*MARGIN;
+    state.cursor.y += rect.w + 2*MARGIN;
 
-    return false;
-
-    // int windowWidth, windowHeight;
-    // glfwGetWindowSize(window, &windowWidth, &windowHeight);
-    //
-    // int frameWidth, frameHeight;
-    // glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
-    //
-    // Basic::Vec2 textSize = font->measureText(label);
-    // Basic::Vec4 rect = {pos.x, pos.y, textSize.x + 2 * buttonPadding, textSize.y + 2 * buttonPadding};
-    //
-    // static int prevState = GLFW_RELEASE;
-    // int newState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-    // bool hovered = insideRect({mouse.x, mouse.y}, rect);
-    // bool mouseDown = newState == GLFW_PRESS && prevState == GLFW_RELEASE;
-    //
-    // Basic::Vec4 color = hovered
-    //                         ? (mouseDown ? Basic::hexColor(0xFFFF0000) : Basic::hexColor(0xFF00FF00))
-    //                         : Basic::hexColor(0xFFFFFFFF);
-    // prevState = newState;
-    //
-    // Renderer::Quad quad(rect, color, nullptr);
-    // renderer.submit(quad);
-    //
-    // float textX = pos.x + buttonPadding;
-    // float textY = pos.y + (rect.w + textSize.y) / 2.0f;
-    // textRenderer.submit({label, {textX, textY}, Basic::hexColor(0xFF000000)});
-    //
-    // return hovered && mouseDown;
+    return hovered && mouseDown;
 }
 
-Basic::Vec2 Gui::transform(Basic::Vec2 point) {
-    float x = point.x;
-    float y = point.y;
+Basic::Vec2 Gui::transform(const Basic::Vec2 point) {
+    ContentState& state = getCurrentState();
 
-    for (const auto &content: contentStack) {
-        x += content.rect.x + MARGIN;
-        y += content.rect.y + MARGIN + content.scrollY;
-    }
-
-    return {x, y};
+    return {
+        state.rect.x + point.x,
+        state.rect.y + point.y + scrollData[state.id]
+    };
 }
 
-Basic::Vec4 Gui::transform(Basic::Vec4 rect) {
-    Basic::Vec2 pos = transform(Basic::Vec2{rect.x, rect.y});
-    return {pos.x, pos.y, rect.z, rect.w};
+Gui::ContentState& Gui::getCurrentState() {
+    return contentStack[currenStateIndex];
 }
