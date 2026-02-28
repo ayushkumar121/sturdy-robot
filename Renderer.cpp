@@ -4,12 +4,12 @@
 #include "QuadMesh.h"
 #include "ShaderLibrary.h"
 
-void Renderer::begin(Basic::Vec4 rect) {
-    this->projection = Basic::Mat4::projection(rect.x, rect.y, rect.z, rect.w);
+void Renderer::begin(Basic::Vec2 frameSize) {
+    this->projection = Basic::Mat4::projection(0.0f, 0.0f, frameSize.x, frameSize.y);
     drawList.clear();
 }
 
-void Renderer::submit(Quad &quad) {
+void Renderer::submit(Quad quad) {
     drawList.push_back(quad);
 }
 
@@ -49,8 +49,4 @@ void Renderer::end() {
 
         QuadMesh::getInstance().draw();
     }
-}
-
-void Renderer::clear() {
-    drawList.clear();
 }

@@ -15,10 +15,9 @@ public:
         Texture* texture;
     };
 
-    void begin(Basic::Vec4 rect);
-    void submit(Quad& quad);
+    void begin(Basic::Vec2 frameSize);
+    void submit(Quad quad);
     void end();
-    void clear();
 private:
     std::vector<Quad> drawList;
     Basic::Mat4 projection{};

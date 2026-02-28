@@ -3,7 +3,6 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
-#include <string>
 
 #include "Font.h"
 #include "Basic.h"
@@ -13,25 +12,25 @@
 class Gui {
 public:
 	Gui();
+	~Gui();
 
-	void begin();
+	void begin(std::string_view label, Basic::Vec4 rect);
 	void end();
 
-	void scrollBegin(int x, int y, int width, int height);
-	void scrollEnd();
-	void text(std::string_view text, Basic::Vec4 rect, Basic::Color color);
-	bool button(std::string_view label, Basic::Vec2 pos);
+	void text(std::string_view text, Basic::Color color);
+	bool button(std::string_view label);
+	int getId() const;
 private:
-	float measureTextHeight(std::string_view text, Basic::Vec4 rect);
-
-	GLFWwindow *window;
+	GLFWwindow *glfwWindow;
 	const Font* font;
 
 	Renderer renderer{};
 	TextRenderer textRenderer{};
-	Basic::IVec2 frameSize{};
+	Basic::Vec2 frameSize{};
+	std::string_view label;
 	Basic::Vec2 mouse{};
-	Basic::Vec4 scrollRect{};
+	Basic::Vec4 rect{};
+	Basic::Vec2 cursor{};
 
-	float offsetY = 0.0f;
+	Basic::Vec2 transform(Basic::Vec2 point) const;
 };

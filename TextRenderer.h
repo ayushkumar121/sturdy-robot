@@ -16,10 +16,9 @@ public:
 		Basic::Color color;
 	};
 
-	void begin(const Font* font, Basic::Vec4 rect);
+	void begin(const Font *font, Basic::Vec2 frameSize);
 	void submit(Text text);
 	void end();
-	void clear();
 private:
 	const Font* font = nullptr;
 	std::vector<Text> drawList;
