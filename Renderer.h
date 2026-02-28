@@ -16,9 +16,8 @@ public:
     };
 
     void begin(Basic::Vec2 frameSize);
-    void submit(Quad& quad);
+    void submit(Quad quad);
     void end();
-    void clear();
 private:
     std::vector<Quad> drawList;
     Basic::Mat4 projection{};

@@ -46,12 +46,17 @@ void Game::render(GLFWwindow* window) {
         // Basic::Vec4 panelRect = {0.0f, 2.0f * frameRect.w / 3.0f, frameRect.z, frameRect.w / 4.0f};
 
         Gui gui;
-        gui.begin({0.0f, 0.0f, frameSize.x, frameSize.y/3.0f});
+        gui.begin("win1", {0.0f, 0.0f, frameSize.x, frameSize.y/3.0f});
         {
             gui.button("Next");
             gui.button("Test Button");
             gui.text(dialogue.text, Basic::hexColor(0xFF000000));
-            gui.button("Test long Button .........");
+            gui.button("Test Button");
+            gui.button("Test Button");
+            gui.text(dialogue.text, Basic::hexColor(0xFF000000));
+
+            gui.button("Test Button");
+            gui.button("Test Button");
 
             // gui.scrollBegin(0, (int)panelRect.y, (int)panelRect.z, (int)panelRect.w);
             // {
@@ -66,6 +71,14 @@ void Game::render(GLFWwindow* window) {
             // }
         }
         gui.end();
+
+        gui.begin("win2", {0.0f, frameSize.y/3.0f, frameSize.x, frameSize.y/3.0f});
+        {
+            gui.text(dialogue.text, Basic::hexColor(0xFF000000));
+            gui.button("Test long Button .........");
+        }
+        gui.end();
+
     } else {
         // Draw choices
     }

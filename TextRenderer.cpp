@@ -55,7 +55,3 @@ void TextRenderer::end() {
 	    }
     }
 }
-
-void TextRenderer::clear() {
-	drawList.clear();
-}

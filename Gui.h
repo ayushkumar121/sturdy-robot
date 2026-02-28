@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include <vector>
 #include <GLFW/glfw3.h>
-#include <string>
 
 #include "Font.h"
 #include "Basic.h"
@@ -13,34 +11,26 @@
 
 class Gui {
 public:
-	struct ContentState {
-		int id;
-		Basic::Vec4 rect{}; // absolute world coordinates
-		Basic::Vec2 cursor{};
-		std::vector<Renderer::Quad> quads;
-		std::vector<TextRenderer::Text> texts;
-	};
-
 	Gui();
 	~Gui();
 
-	void begin(Basic::Vec2 size);
+	void begin(std::string_view label, Basic::Vec4 rect);
 	void end();
 
 	void text(std::string_view text, Basic::Color color);
 	bool button(std::string_view label);
+	int getId() const;
 private:
-	int id = 0;
-	GLFWwindow *window;
+	GLFWwindow *glfwWindow;
 	const Font* font;
 
 	Renderer renderer{};
 	TextRenderer textRenderer{};
 	Basic::Vec2 frameSize{};
+	std::string_view label;
 	Basic::Vec2 mouse{};
-	std::vector<ContentState> contentStack{};
-	int currenStateIndex = -1;
+	Basic::Vec4 rect{};
+	Basic::Vec2 cursor{};
 
-	Basic::Vec2 transform(const Basic::Vec2 point);
-	ContentState& getCurrentState();
+	Basic::Vec2 transform(Basic::Vec2 point) const;
 };

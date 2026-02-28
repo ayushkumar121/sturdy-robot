@@ -9,7 +9,7 @@ void Renderer::begin(Basic::Vec2 frameSize) {
     drawList.clear();
 }
 
-void Renderer::submit(Quad &quad) {
+void Renderer::submit(Quad quad) {
     drawList.push_back(quad);
 }
 
@@ -49,8 +49,4 @@ void Renderer::end() {
 
         QuadMesh::getInstance().draw();
     }
-}
-
-void Renderer::clear() {
-    drawList.clear();
 }
