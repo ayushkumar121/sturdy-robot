@@ -2,6 +2,8 @@
 
 #include "Game.h"
 
+#include <iostream>
+
 #include "Gui.h"
 #include "Renderer.h"
 #include "TextureLibrary.h"
@@ -21,66 +23,83 @@ void Game::update(GLFWwindow* window) {
 void Game::render(GLFWwindow* window) {
     Basic::Vec2 frameSize = getFrameSize(window);
 
-    if (!storyEngine.isDialogueFinished()) {
-        const StoryEngine::Dialogue& dialogue = storyEngine.getCurrentDialogue();
+    Renderer renderer;
+    Gui gui;
 
-        // Renderer renderer;
-        // renderer.begin(frameRect);
-        // {
-        //     // Drawing background
-        //     Texture& tex4 = TextureLibrary::getInstance().getTexture(dialogue.backgroundPath);
-        //     Renderer::Quad background{frameRect, Basic::hexColor(0xFFFFFFFF), &tex4};
-        //     renderer.submit(background);
-        //
-        //     // Drawing character
-        //     Texture &tex1 = TextureLibrary::getInstance().getTexture(dialogue.characterSpritePath);
-        //     float characterHeight = frameRect.w;
-        //     float characterWidth = (characterHeight / tex1.getHeight()) * tex1.getWidth();
-        //     float characterPosX = (dialogue.speakerPosition == StoryEngine::SpeakerPosition::RIGHT)? frameRect.z - characterWidth : 0.0f;
-        //     Renderer::Quad character{{characterPosX, 0.0f, characterWidth, characterHeight}, Basic::hexColor(0xFFFFFFFF), &tex1};
-        //     renderer.submit(character);
-        // }
-        // renderer.end();
+    renderer.begin(frameSize);
+    {
+        // Draw desktop background
+        Basic::Vec4 frameRect = {0.0f, 0.0f, frameSize.x, frameSize.y};
+        Texture &backgroundTex = TextureLibrary::getInstance().getTexture("assets/backgrounds/officedark.jpg");
+        renderer.submit({frameRect, Basic::hexColor(0xFFFFFFFF), &backgroundTex});
+        renderer.submit({frameRect, Basic::hexColor(0x55000000), nullptr});
+    }
+    renderer.end();
 
-        // GUI Layer
-        // Basic::Vec4 panelRect = {0.0f, 2.0f * frameRect.w / 3.0f, frameRect.z, frameRect.w / 4.0f};
-
-        Gui gui;
-        gui.begin("win1", {0.0f, 0.0f, frameSize.x, frameSize.y/3.0f});
-        {
-            gui.button("Next");
-            gui.button("Test Button");
-            gui.text(dialogue.text, Basic::hexColor(0xFF000000));
-            gui.button("Test Button");
-            gui.button("Test Button");
-            gui.text(dialogue.text, Basic::hexColor(0xFF000000));
-
-            gui.button("Test Button");
-            gui.button("Test Button");
-
-            // gui.scrollBegin(0, (int)panelRect.y, (int)panelRect.z, (int)panelRect.w);
-            // {
-            //     float padding = 20.0f;
-            //     Basic::Vec4 textRect = {panelRect.x + padding, panelRect.y + padding, panelRect.z - 2 * padding, panelRect.w - 2 * padding };
-            //     gui.text(dialogue.text, textRect, Basic::hexColor(0xFF000000));
-            // }
-            // gui.scrollEnd();
-            //
-            // if (gui.button("Next")) {
-            //     storyEngine.advance();
-            // }
+    switch (gameScreen) {
+        case DESKTOP: {
+            gui.begin("Desktop", {0.0f, frameSize.y * 0.8f, frameSize.x, frameSize.y});
+            Texture &bot = TextureLibrary::getInstance().getTexture("assets/characters/cordova_bot.png");
+            gui.image(&bot, {100.0f, 100.0f});
+            if (gui.button("Chat bot")) {
+                gameScreen = CHATBOT;
+            }
+            gui.end();
         }
-        gui.end();
+        break;
+        case CHATBOT: {
+            Basic::Vec4 panelRect = {frameSize.x * 0.10f, frameSize.y * 0.10f, frameSize.x * 0.8f, frameSize.y * 0.8f};
+            renderer.begin(frameSize);
+            {
+                renderer.submit({panelRect, Basic::hexColor(0xAAFFFFFF), nullptr});
+            }
+            renderer.end();
 
-        gui.begin("win2", {0.0f, frameSize.y/3.0f, frameSize.x, frameSize.y/3.0f});
-        {
-            gui.text(dialogue.text, Basic::hexColor(0xFF000000));
-            gui.button("Test long Button .........");
+            std::string taskId = "task_01";
+            TaskEngine::Task &task = taskEngine.getTask(taskId);
+
+            Basic::Vec4 chatRect = {panelRect.x, panelRect.y, panelRect.z * 0.7f, panelRect.w};
+            gui.begin("ChatWindow", chatRect);
+            {
+                if (gui.button("Close")) {
+                    gameScreen = DESKTOP;
+                }
+
+                const TaskEngine::Message &message = task.getCurrentMessage();
+                Texture &bot = TextureLibrary::getInstance().getTexture("assets/characters/cordova_bot.png");
+                gui.image(&bot, {100.0f, 100.0f});
+                gui.text(message.text, Basic::hexColor(0xFF666666));
+                for (auto &choice: message.choices) {
+                    if (gui.button(choice.text)) {
+                        task.chooseReply(choice.nextMessageId);
+                    };
+                }
+            }
+            gui.end();
+
+            Basic::Vec4 projectFileRect = {chatRect.x + chatRect.z, panelRect.y, panelRect.z * 0.3f, panelRect.w};
+            gui.begin("ProjectFiles", projectFileRect);
+            gui.text("Project Files", Basic::hexColor(0xFF666666));
+            {
+                for (auto &[_, file]: task.files) {
+                    if (file.type == TaskEngine::FileType::IMAGE) {
+                        Texture &tex = TextureLibrary::getInstance().getTexture(file.path);
+                        float texWidth = panelRect.z * 0.15f;
+                        float texHeight = texWidth * ((float) tex.getHeight() / (float) tex.getWidth());
+                        gui.image(&tex, {texWidth, texHeight});
+                    }
+                    gui.button(file.name);
+                }
+            }
+            gui.end();
+
+            gui.begin("Submit", chatRect);
+            gui.moveCursor({0.0f, chatRect.w * 0.9f});
+            gui.button("Submit Current Files");
+            gui.end();
         }
-        gui.end();
-
-    } else {
-        // Draw choices
+        break;
+        default: break;
     }
 }
 

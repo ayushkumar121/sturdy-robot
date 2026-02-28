@@ -65,11 +65,11 @@ bool StoryEngine::isDialogueFinished() const {
 void StoryEngine::advance() {
     const StoryNode& currentNode = nodes.at(currentNodeId);
     if (currentDialogueId < currentNode.dialogues.size()) {
-        currentDialogueId = (currentDialogueId+1)%currentNode.dialogues.size();
+        currentDialogueId = currentDialogueId+1;
     } else {
         currentDialogueId = 0;
-        // currentNodeId = nodes[currentNodeId].nextNodeId;
-        // currentDialogueId = 0;
+        currentNodeId = nodes[currentNodeId].nextNodeId;
+        currentDialogueId = 0;
     }
 }
 

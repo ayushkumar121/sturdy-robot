@@ -6,6 +6,7 @@
 
 #include "Font.h"
 #include "Basic.h"
+#include "Texture.h"
 #include "Renderer.h"
 #include "TextRenderer.h"
 
@@ -17,9 +18,10 @@ public:
 	void begin(std::string_view label, Basic::Vec4 rect);
 	void end();
 
+	void moveCursor(Basic::Vec2 pos);
 	void text(std::string_view text, Basic::Color color);
 	bool button(std::string_view label);
-	int getId() const;
+	void image(Texture* texture, Basic::Vec2 size);
 private:
 	GLFWwindow *glfwWindow;
 	const Font* font;
@@ -31,6 +33,8 @@ private:
 	Basic::Vec2 mouse{};
 	Basic::Vec4 rect{};
 	Basic::Vec2 cursor{};
+	bool mouseDown;
 
+	int getId() const;
 	Basic::Vec2 transform(Basic::Vec2 point) const;
 };

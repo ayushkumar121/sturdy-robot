@@ -5,12 +5,22 @@
 #include <GLFW/glfw3.h>
 
 #include "StoryEngine.h"
+#include "TaskEngine.h"
 
 class Game {
 public:
+	enum GameScreen {
+		DESKTOP,
+		CHATBOT,
+		EMAIL,
+		CONVERSATION,
+	};
+
 	Game();
 	void update(GLFWwindow* window);
 	void render(GLFWwindow* window);
 private:
 	StoryEngine storyEngine;
+	TaskEngine taskEngine;
+	GameScreen gameScreen = DESKTOP;
 };

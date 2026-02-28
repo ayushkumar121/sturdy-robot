@@ -40,6 +40,11 @@ Gui::Gui() {
     glfwGetFramebufferSize(glfwWindow, &frameWidth, &frameHeight);
     frameSize = {(float)frameWidth, (float)frameHeight};
 
+    static int prevState = GLFW_RELEASE;
+    int newState = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT);
+    mouseDown = newState == GLFW_PRESS && prevState == GLFW_RELEASE;
+    prevState = newState;
+
     mouse.x = (float) mouseX * (frameSize.x / (float) windowWidth);
     mouse.y = (float) mouseY * (frameSize.y / (float) windowHeight);
 }
@@ -58,7 +63,7 @@ void Gui::begin(std::string_view label, Basic::Vec4 rect) {
     renderer.begin(frameSize);
     textRenderer.begin(font, frameSize);
 
-    renderer.submit(Renderer::Quad{rect, Basic::hexColor(0x22FFFFFF), nullptr});
+    // renderer.submit(Renderer::Quad{rect, Basic::hexColor(0x22FFFFFF), nullptr});
 }
 
 void Gui::end() {
@@ -82,6 +87,11 @@ void Gui::end() {
     textRenderer.end();
 
     glDisable(GL_SCISSOR_TEST);
+}
+
+void Gui::moveCursor(Basic::Vec2 pos) {
+    cursor.x += pos.x;
+    cursor.y += pos.y;
 }
 
 int Gui::getId() const {
@@ -135,13 +145,8 @@ bool Gui::button(std::string_view text) {
     Basic::Vec2 textSize = font->measureText(text);
     Basic::Vec4 rect = {pos.x, pos.y, textSize.x + 2 * PADDING, textSize.y + 2 * PADDING};
 
-    static int prevState = GLFW_RELEASE;
-    int newState = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT);
     bool hovered = insideRect(mouse, rect);
-    bool mouseDown = newState == GLFW_PRESS && prevState == GLFW_RELEASE;
-    prevState = newState;
-
-    Basic::Vec4 color = hovered? 
+    Basic::Vec4 color = hovered?
         (mouseDown ? Basic::hexColor(0xFFFF0000) : Basic::hexColor(0xFF00FF00))
         : Basic::hexColor(0xFFFFFFFF);
     renderer.submit({rect, color, nullptr});
@@ -152,4 +157,11 @@ bool Gui::button(std::string_view text) {
     cursor.y += rect.w + 2*MARGIN;
 
     return hovered && mouseDown;
+}
+
+void Gui::image(Texture* texture, Basic::Vec2 size) {
+    Basic::Vec2 pos = transform(cursor);
+    Basic::Vec4 rect = {pos.x, pos.y, size.x, size.y};
+    renderer.submit({rect, Basic::hexColor(0xFFFFFFFF), texture});
+    cursor.y += rect.w + 2*MARGIN;
 }
