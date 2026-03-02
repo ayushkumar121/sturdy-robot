@@ -32,9 +32,11 @@ public:
 		std::unordered_map<std::string, Message> messages;
 		std::unordered_map<std::string, File> files;
 		std::string currentMessage;
+		std::string startMessage;
 
 		const Message& getCurrentMessage();
 		void chooseReply(std::string choice);
+		void reset();
 	};
 
 	TaskEngine();

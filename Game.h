@@ -22,5 +22,6 @@ public:
 private:
 	StoryEngine storyEngine;
 	TaskEngine taskEngine;
+	std::string taskId = "task_01";
 	GameScreen gameScreen = DESKTOP;
 };

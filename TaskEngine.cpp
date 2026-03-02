@@ -18,6 +18,10 @@ void TaskEngine::Task::chooseReply(std::string choice) {
 	}
 }
 
+void TaskEngine::Task::reset() {
+	currentMessage = startMessage;
+}
+
 TaskEngine::TaskEngine() {
 	// TODO: load from json
 	auto task = Task{
@@ -123,6 +127,7 @@ TaskEngine::TaskEngine() {
 					}
 				}
 		},
+		"message_01",
 		"message_01",
 	};
 	tasks.insert({task.id, task});
