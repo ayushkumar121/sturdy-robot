@@ -2,6 +2,7 @@
 
 #include "Renderer.h"
 #include "QuadMesh.h"
+#include "WhiteTexture.h"
 #include "ShaderLibrary.h"
 
 void Renderer::begin(Basic::Vec2 frameSize) {
@@ -14,38 +15,36 @@ void Renderer::submit(Quad quad) {
 }
 
 void Renderer::end() {
-    auto& shaderLib = ShaderLibrary::getInstance();
-    Shader* currentShader = nullptr;
-    Texture* currentTexture = nullptr;
+    Shader& shader = ShaderLibrary::getInstance().getShader(ShaderLibrary::ShaderType::QUAD);
+    shader.bind();
+    shader.setValue("view", Basic::Mat4::identity());
+    shader.setValue("projection", projection);
+    shader.setValue("tex", 0);
+
+    WhiteTexture& whiteTexture = WhiteTexture::getInstance();
 
     for (const Quad& quad : drawList) {
-        Shader* needed = quad.texture
-        ? &shaderLib.getShader(ShaderLibrary::ShaderType::TEXTURED)
-        : &shaderLib.getShader(ShaderLibrary::ShaderType::COLORED);
-
-        if (needed != currentShader) {
-            currentShader = needed;
-            currentShader->bind();
-            currentShader->setValue("view", Basic::Mat4::identity());
-            currentShader->setValue("projection", projection);
-            if (quad.texture) {
-                currentShader->setValue("tex", 0);
-            }
-        }
-
-        if (quad.texture != currentTexture) {
-            currentTexture = quad.texture;
-            if (currentTexture) {
-                currentTexture->bind(0);
-            }
+        int width, height;
+        if (quad.texture != nullptr) {
+            quad.texture->bind(0);
+            width = quad.texture->getWidth();
+            height = quad.texture->getWidth();
+        } else {
+            whiteTexture.bind(0);
+            width = 1;
+            height = 1;
         }
 
         auto transform = Basic::Mat4::identity()
             * Basic::Mat4::translate(quad.rect.x, quad.rect.y, 0.0f)
             * Basic::Mat4::scale(quad.rect.z, quad.rect.w, 1.0f);
 
-        currentShader->setValue("transform", transform);
-        currentShader->setValue("color", quad.color);
+        shader.setValue("transform", transform);
+        shader.setValue("color", quad.color);
+        shader.setValue("borderColor", Basic::hexColor(0xFF000000));
+        shader.setValue("borderSize", 4.0f);
+        shader.setValue("rectSize", Basic::Vec2{quad.rect.z, quad.rect.w});
+        shader.setValue("texelSize", Basic::Vec2{1.0f/(float)width, 1.0f/(float)height});
 
         QuadMesh::getInstance().draw();
     }

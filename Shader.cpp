@@ -62,6 +62,10 @@ void Shader::setValue(std::string_view name, Basic::Vec4 vec4) const {
     glUniform4f(glGetUniformLocation(shaderId, name.data()), vec4.x, vec4.y, vec4.z, vec4.w);
 }
 
+void Shader::setValue(std::string_view name, Basic::Vec2 vec2) const {
+    glUniform2f(glGetUniformLocation(shaderId, name.data()), vec2.x, vec2.y);
+}
+
 void Shader::setValue(std::string_view name, float value) const {
     glUniform1f(glGetUniformLocation(shaderId, name.data()), value);
 }
