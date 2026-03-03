@@ -99,9 +99,9 @@ void Gui::setMargin(float margin) {
     this->margin = margin;
 }
 
-void Gui::moveCursor(Basic::Vec2 pos) {
-    cursor.x = pos.x;
-    cursor.y = pos.y;
+void Gui::moveCursor(float x, float y) {
+    cursor.x = x;
+    cursor.y = y;
 }
 
 int Gui::getId() const {
@@ -178,10 +178,10 @@ void Gui::image(Texture* texture, Basic::Vec2 size) {
 
 bool Gui::imageButton(Texture* texture, Basic::Vec2 size) {
     Basic::Vec2 pos = transform(cursor);
-    Basic::Vec4 rect = {pos.x, pos.y, size.x, size.y};
+    Basic::Vec4 rect = {pos.x + margin, pos.y + margin, size.x, size.y};
 
     bool hovered = insideRect(mouse, rect);
-    Basic::Vec4 color = hovered? Basic::hexColor(0xAA00FF00):Basic::hexColor(0xFFFFFFFF);
+    Basic::Vec4 color = hovered? Basic::hexColor(0x55FFFFFF):Basic::hexColor(0xFFFFFFFF);
     renderer.submit({rect, color, texture});
     cursor.y += rect.w + 2*margin;
     return hovered && mouseDown;

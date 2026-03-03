@@ -23,7 +23,7 @@ public:
 	Basic::Vec2 getCursor();
 	float getMargin() const;
 	void setMargin(float margin);
-	void moveCursor(Basic::Vec2 pos);
+	void moveCursor(float x, float y);
 	void text(std::string_view text, Basic::Color color);
 	bool button(std::string_view label);
 	void image(Texture* texture, Basic::Vec2 size);

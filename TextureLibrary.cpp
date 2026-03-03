@@ -2,6 +2,13 @@
 
 #include "TextureLibrary.h"
 
+#include <iostream>
+#include <ostream>
+
+TextureLibrary::~TextureLibrary() {
+    std::cerr << "TextureLibrary destroyed" << std::endl;
+}
+
 TextureLibrary & TextureLibrary::getInstance() {
     static TextureLibrary textureLibrary;
     return textureLibrary;

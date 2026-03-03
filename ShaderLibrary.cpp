@@ -17,6 +17,10 @@ ShaderLibrary::ShaderLibrary() {
     );
 }
 
+ShaderLibrary::~ShaderLibrary() {
+    std::cerr << "Shader Library destroyed" << std::endl;
+}
+
 ShaderLibrary& ShaderLibrary::getInstance() {
     static ShaderLibrary shaderLibrary;
     return shaderLibrary;
