@@ -2,19 +2,18 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <string>
+#include <cstdint>
+#include <string_view>
 
 class Texture {
 public:
-    Texture(std::string texturePath);
+    Texture(std::string_view texturePath);
     ~Texture();
     void bind(uint32_t slot) const;
     int getWidth() const;
     int getHeight() const;
 private:
-    int width;
-    int height;
-    std::string texturePath;
-    uint32_t textureId;
+    int width{};
+    int height{};
+    uint32_t textureId{};
 };

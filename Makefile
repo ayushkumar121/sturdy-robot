@@ -1,32 +1,28 @@
 PROJECT_NAME=game
 CXX=g++
 CC=gcc
-CXX_FLAGS=-Wall -Wno-missing-braces -Wno-deprecated-declarations -g -std=c++23 -Ivender/glad/include -Ivender/stb -Ivender/glfw/include
-LIB_FREETYPE_FLAGS=$(shell pkg-config --cflags freetype2)
-LIB_FREETYPE_LIBS=$(shell pkg-config --libs freetype2)
-UNAME_S := $(shell uname -s)
+CXX_FLAGS=-Wall -Wno-missing-braces -Wno-deprecated-declarations -g -std=c++23 -Ivender/glad/include -Ivender/stb -Ivender/glfw/include $(shell pkg-config --cflags freetype2)
 
+UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-    CXX_LIBS=-Lvender/glfw/lib-arm64mac -lglfw3 -framework Cocoa -framework IOKit -framework CoreVideo -framework OpenGL
+    CXX_LIBS=-Lvender/glfw/lib-arm64mac -lglfw3 -framework Cocoa -framework IOKit -framework CoreVideo -framework OpenGL $(shell pkg-config --libs freetype2)
 else
-    CXX_LIBS=-lglfw -lGL -lm
+    CXX_LIBS=-lglfw -lGL -lm $(shell pkg-config --libs freetype2)
 endif
 
-SRC := main.cpp Basic.cpp Texture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp QuadMesh.cpp Renderer.cpp Gui.cpp Font.cpp FontLibrary.cpp TextRenderer.cpp StoryEngine.cpp TaskEngine.cpp Game.cpp
+# Source files
+SRC :=main.cpp Basic.cpp Texture.cpp DummyTexture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp \
+QuadMesh.cpp Renderer.cpp Gui.cpp Font.cpp FontLibrary.cpp TextRenderer.cpp \
+StoryEngine.cpp TaskEngine.cpp Game.cpp
+OBJ := $(SRC:.cpp=.o)
 
 all: $(PROJECT_NAME)
 
-$(PROJECT_NAME).app: $(PROJECT_NAME)
-	rm -rf $(PROJECT_NAME).app
-	mkdir -p $(PROJECT_NAME).app/Contents/MacOS
-	mkdir -p $(PROJECT_NAME).app/Contents/Resources
+$(PROJECT_NAME): $(OBJ) gl.o stb_image.o
+	$(CXX) -o $@ $^ $(CXX_LIBS)
 
-	cp $(PROJECT_NAME) $(PROJECT_NAME).app/Contents/MacOS/
-	cp -R assets $(PROJECT_NAME).app/Contents/Resources/
-	cp Info.plist $(PROJECT_NAME).app/Contents
-
-$(PROJECT_NAME): $(SRC) gl.o stb_image.o
-	$(CXX) -o $(PROJECT_NAME) $(SRC) gl.o stb_image.o $(CXX_FLAGS) $(CXX_LIBS) $(LIB_FREETYPE_FLAGS) $(LIB_FREETYPE_LIBS)
+%.o: %.cpp
+	$(CXX) $(CXX_FLAGS) $(CXX_LIBS) -c $< -o $@
 
 gl.o: vender/glad/src/gl.c
 	$(CC) -c -o gl.o vender/glad/src/gl.c -Ivender/glad/include 
@@ -34,5 +30,14 @@ gl.o: vender/glad/src/gl.c
 stb_image.o: vender/stb/stb_image.c
 	$(CC) -c -o stb_image.o vender/stb/stb_image.c -Ivender/stb
 
+$(PROJECT_NAME).app: $(PROJECT_NAME)
+	rm -rf $@
+	mkdir -p $@/Contents/MacOS
+	mkdir -p $@/Contents/Resources
+	cp $(PROJECT_NAME) $@/Contents/MacOS/
+	cp -R assets $@/Contents/Resources/
+	cp Info.plist $@/Contents
+
 clean:
-	rm -f $(PROJECT_NAME) gl.o stb_image.o
+	rm -f $(PROJECT_NAME) $(OBJ) gl.o stb_image.o
+	rm -rf $(PROJECT_NAME).app

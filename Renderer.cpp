@@ -1,6 +1,8 @@
 // Created by ari on 2/23/26.
 
 #include "Renderer.h"
+
+#include "DummyTexture.h"
 #include "QuadMesh.h"
 #include "ShaderLibrary.h"
 
@@ -14,38 +16,25 @@ void Renderer::submit(Quad quad) {
 }
 
 void Renderer::end() {
-    auto& shaderLib = ShaderLibrary::getInstance();
-    Shader* currentShader = nullptr;
-    Texture* currentTexture = nullptr;
+    const Shader& shader = ShaderLibrary::getInstance().getShader(ShaderLibrary::ShaderType::QUAD);
+    shader.bind();
+    shader.setValue("view", Basic::Mat4::identity());
+    shader.setValue("projection", projection);
+    shader.setValue("tex", 0);
 
     for (const Quad& quad : drawList) {
-        Shader* needed = quad.texture
-        ? &shaderLib.getShader(ShaderLibrary::ShaderType::TEXTURED)
-        : &shaderLib.getShader(ShaderLibrary::ShaderType::COLORED);
-
-        if (needed != currentShader) {
-            currentShader = needed;
-            currentShader->bind();
-            currentShader->setValue("view", Basic::Mat4::identity());
-            currentShader->setValue("projection", projection);
-            if (quad.texture) {
-                currentShader->setValue("tex", 0);
-            }
-        }
-
-        if (quad.texture != currentTexture) {
-            currentTexture = quad.texture;
-            if (currentTexture) {
-                currentTexture->bind(0);
-            }
+        if (quad.texture != nullptr) {
+            quad.texture->bind(0);
+        } else {
+            DummyTexture::getInstance().bind(0);
         }
 
         auto transform = Basic::Mat4::identity()
             * Basic::Mat4::translate(quad.rect.x, quad.rect.y, 0.0f)
             * Basic::Mat4::scale(quad.rect.z, quad.rect.w, 1.0f);
 
-        currentShader->setValue("transform", transform);
-        currentShader->setValue("color", quad.color);
+        shader.setValue("transform", transform);
+        shader.setValue("color", quad.color);
 
         QuadMesh::getInstance().draw();
     }

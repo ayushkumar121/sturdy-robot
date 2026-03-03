@@ -9,11 +9,9 @@
 class ShaderLibrary {
 public:
     enum class ShaderType {
-        COLORED,
-        TEXTURED,
+        QUAD,
         FONT
     };
-    ~ShaderLibrary();
     static ShaderLibrary& getInstance();
     Shader& getShader(ShaderType type);
 private:

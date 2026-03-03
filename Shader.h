@@ -12,6 +12,7 @@ public:
 
     void bind() const;
     void setValue(std::string_view name, Basic::Vec4 vec4) const;
+    void setValue(std::string_view name, Basic::Vec2 vec2) const;
     void setValue(std::string_view name, float value) const;
     void setValue(std::string_view name, int value) const;
     void setValue(std::string_view name, Basic::Mat4 mat4) const;

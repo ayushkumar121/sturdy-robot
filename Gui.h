@@ -10,6 +10,8 @@
 #include "Renderer.h"
 #include "TextRenderer.h"
 
+constexpr float DEFAULT_MARGIN = 20.0f;
+
 class Gui {
 public:
 	Gui();
@@ -19,6 +21,8 @@ public:
 	void end();
 
 	Basic::Vec2 getCursor();
+	float getMargin() const;
+	void setMargin(float margin);
 	void moveCursor(Basic::Vec2 pos);
 	void text(std::string_view text, Basic::Color color);
 	bool button(std::string_view label);
@@ -36,7 +40,8 @@ private:
 	Basic::Vec2 mouse{};
 	Basic::Vec4 layout{};
 	Basic::Vec2 cursor{};
-	bool mouseDown;
+	float margin{};
+	bool mouseDown{};
 
 	int getId() const;
 	Basic::Vec2 transform(Basic::Vec2 point) const;
