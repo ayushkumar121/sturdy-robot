@@ -61,14 +61,15 @@ int main(int argc, char** argv) {
     glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
     glViewport(0, 0, frameWidth, frameHeight);
 
+    game = new Game();
+    glfwSetWindowUserPointer(window, game);
+
     glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
     glfwSetWindowRefreshCallback(window, updateFrame);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    game = new Game();
-    glfwSetWindowUserPointer(window, game);
 
     while (!glfwWindowShouldClose(window)) {
         updateFrame(window);

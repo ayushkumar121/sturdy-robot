@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Basic.h"
+#include "Gui.h"
 #include "StoryEngine.h"
 #include "TaskEngine.h"
 
@@ -24,17 +25,21 @@ public:
 	void update(float dt);
 	void render(float dt);
 private:
-	StoryEngine storyEngine;
-	TaskEngine taskEngine;
-
 	Screen screen = Screen::DESKTOP;
 	SubScreen subScreen = SubScreen::NONE;
+	SubScreen targetSubScreen = SubScreen::NONE;
 
-	float subScreenY{};
+	Basic::Vec2 frameSize{};
+	float subScreenY;
+	float targetSubScreenY;
+
+	Gui gui;
+	StoryEngine storyEngine;
+
+	std::string currentTaskId = "task_01";
 
 	void renderDesktop(float dt);
-	void openSubScreen(Basic::Vec2 frameSize, SubScreen subScreen);
-	void renderSubScreen(Basic::Vec2 frameSize);
-
-	void renderTaskBar(Basic::Vec2 frameSize);
+	void renderBackground(float dt);
+	void renderSubScreen(float dt);
+	void renderTaskBar(float dt);
 };

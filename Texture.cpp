@@ -25,6 +25,7 @@ Texture::Texture(std::string_view texturePath) {
     if (!data) {
         throw std::runtime_error("failed to load texture");
     }
+    std::cerr << "Loaded Size: " << width << " " << height << std::endl;
 
     auto format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, format, GL_UNSIGNED_BYTE, data);

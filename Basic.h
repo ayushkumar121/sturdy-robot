@@ -56,6 +56,7 @@ namespace Basic {
         Vec4 operator*(const Vec4 &vec4) const;
     };
 
+    float lerp(float a, float b, float t);
     Basic::Color hexColor(uint32_t hex);
     std::string readEntireFile(std::string_view fileName);
 }

@@ -39,8 +39,9 @@ public:
 		void reset();
 	};
 
-	TaskEngine();
+	static TaskEngine& getInstance();
 	Task& getTask(const std::string &id);
 private:
+	TaskEngine();
 	std::unordered_map<std::string, Task> tasks;
 };

@@ -12,14 +12,15 @@ const TaskEngine::Message& TaskEngine::Task::getCurrentMessage() {
 
 void TaskEngine::Task::chooseReply(std::string choice) {
 	currentMessage = std::move(choice);
-	const auto& newFiles = messages.at(currentMessage).files;
-	for (const auto&[key, file] : newFiles) {
-		files[key] = file;
-	}
 }
 
 void TaskEngine::Task::reset() {
 	currentMessage = startMessage;
+}
+
+TaskEngine& TaskEngine::getInstance() {
+	static TaskEngine taskEngine;
+	return taskEngine;
 }
 
 TaskEngine::TaskEngine() {
@@ -30,7 +31,7 @@ TaskEngine::TaskEngine() {
 			{
 				"message_01",
 				{
-					"How can i help you today alex?",
+					"Hi Alex, How can i help you today?",
 					{
 						{"My name is @player", "message_02"},
 						{"Make this poster more relatable", "message_03"},

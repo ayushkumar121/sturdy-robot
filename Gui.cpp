@@ -24,23 +24,21 @@ static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
     scrollDelta += (float) yoffset;
 }
 
-Gui::Gui() {
-    this->glfwWindow = glfwGetCurrentContext();
-    this->font = &FontLibrary::getInstance().getFont(FontLibrary::FontType::ROBOTO);
-    glfwSetScrollCallback(glfwWindow, scrollCallback);
+void Gui::update(GLFWwindow* window) {
+    glfwSetScrollCallback(window, scrollCallback);
 
     double mouseX, mouseY;
-    glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
+    glfwGetCursorPos(window, &mouseX, &mouseY);
 
     int windowWidth, windowHeight;
-    glfwGetWindowSize(glfwWindow, &windowWidth, &windowHeight);
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
     int frameWidth, frameHeight;
-    glfwGetFramebufferSize(glfwWindow, &frameWidth, &frameHeight);
+    glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
     frameSize = {(float)frameWidth, (float)frameHeight};
 
     static int prevState = GLFW_RELEASE;
-    int newState = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT);
+    int newState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
     mouseDown = newState == GLFW_PRESS && prevState == GLFW_RELEASE;
     prevState = newState;
 
@@ -48,20 +46,18 @@ Gui::Gui() {
     mouse.y = (float) mouseY * (frameSize.y / (float) windowHeight);
 }
 
-Gui::~Gui() = default;
-
 Basic::Vec2 Gui::transform(Basic::Vec2 point) const {
     return Basic::Vec2{layout.x + point.x, layout.y + point.y + scrollData[getId()]};
 }
 
 void Gui::begin(std::string_view label, Basic::Vec4 rect) {
     this->label = label;
-    this->layout = {rect.x + margin, rect.y + margin, rect.z - 2*margin, rect.w - 2*margin};
-    this->cursor = {margin, margin};
+    this->layout = rect;
+    this->cursor = {0.0f, 0.0f};
     this->margin = DEFAULT_MARGIN;
 
     renderer.begin(frameSize);
-    textRenderer.begin(font, frameSize);
+    textRenderer.begin(frameSize);
 }
 
 void Gui::end() {
@@ -91,6 +87,10 @@ Basic::Vec2 Gui::getCursor() {
     return cursor;
 }
 
+void Gui::setCursor(Basic::Vec2 newCursor) {
+    cursor = newCursor;
+}
+
 float Gui::getMargin() const {
     return margin;
 }
@@ -99,16 +99,15 @@ void Gui::setMargin(float margin) {
     this->margin = margin;
 }
 
-void Gui::moveCursor(float x, float y) {
-    cursor.x = x;
-    cursor.y = y;
-}
-
 int Gui::getId() const {
     return (int)std::hash<std::string_view>{}(label);
 }
 
-void Gui::text(std::string_view text, Basic::Color color) {
+void Gui::text(std::string_view text, Basic::Color color, const Font* font) {
+    if (font == nullptr) {
+        font = &FontLibrary::getInstance().getFont(FontLibrary::FontType::ROBOTO);
+    }
+
     Basic::Vec2 pos = transform(cursor);
 
     size_t start = 0;
@@ -129,7 +128,7 @@ void Gui::text(std::string_view text, Basic::Color color) {
                 yPos += font->getSize() * font->getLineSpacing();
             }
 
-            textRenderer.submit({word, {xPos, yPos}, color});
+            textRenderer.submit({word, {xPos, yPos}, color, font});
             xPos += textSize.x;
             start = ++end;
         }
@@ -144,14 +143,15 @@ void Gui::text(std::string_view text, Basic::Color color) {
             yPos += font->getSize() * font->getLineSpacing();
         }
 
-        textRenderer.submit({word, {xPos, yPos}, color});
+        textRenderer.submit({word, {xPos, yPos}, color, font});
     }
     cursor.y += yPos - pos.y + 2*margin;
 }
 
 bool Gui::button(std::string_view text) {
-    Basic::Vec2 pos = transform(cursor);
+    const Font* font = &FontLibrary::getInstance().getFont(FontLibrary::FontType::ROBOTO);
 
+    Basic::Vec2 pos = transform(cursor);
     Basic::Vec2 textSize = font->measureText(text);
     Basic::Vec4 rect = {pos.x, pos.y, textSize.x + 2 * PADDING, textSize.y + 2 * PADDING};
 
@@ -163,8 +163,8 @@ bool Gui::button(std::string_view text) {
 
     float textX = pos.x + PADDING;
     float textY = pos.y + (rect.w + textSize.y) / 2.0f;
-    textRenderer.submit({text, {textX, textY}, Basic::hexColor(0xFF000000)});
-    cursor.y += rect.w + 2*margin;
+    textRenderer.submit({text, {textX, textY}, Basic::hexColor(0xFF000000), font});
+    cursor.y += rect.w + margin;
 
     return hovered && mouseDown;
 }
@@ -173,17 +173,17 @@ void Gui::image(Texture* texture, Basic::Vec2 size) {
     Basic::Vec2 pos = transform(cursor);
     Basic::Vec4 rect = {pos.x, pos.y, size.x, size.y};
     renderer.submit({rect, Basic::hexColor(0xFFFFFFFF), texture});
-    cursor.y += rect.w + 2*margin;
+    cursor.y += rect.w + margin;
 }
 
 bool Gui::imageButton(Texture* texture, Basic::Vec2 size) {
     Basic::Vec2 pos = transform(cursor);
-    Basic::Vec4 rect = {pos.x + margin, pos.y + margin, size.x, size.y};
+    Basic::Vec4 rect = {pos.x, pos.y, size.x, size.y};
 
     bool hovered = insideRect(mouse, rect);
     Basic::Vec4 color = hovered? Basic::hexColor(0x55FFFFFF):Basic::hexColor(0xFFFFFFFF);
     renderer.submit({rect, color, texture});
-    cursor.y += rect.w + 2*margin;
+    cursor.y += rect.w + margin;
     return hovered && mouseDown;
 }
 
@@ -191,5 +191,5 @@ void Gui::rect(Basic::Color color, Basic::Vec2 size) {
     Basic::Vec2 pos = transform(cursor);
     Basic::Vec4 rect = {pos.x, pos.y, size.x, size.y};
     renderer.submit({rect, color, nullptr});
-    cursor.y += rect.w + 2*margin;
+    cursor.y += rect.w + margin;
 }

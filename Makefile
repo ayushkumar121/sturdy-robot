@@ -22,7 +22,7 @@ $(PROJECT_NAME): $(OBJ) gl.o stb_image.o
 	$(CXX) -o $@ $^ $(CXX_LIBS)
 
 %.o: %.cpp
-	$(CXX) $(CXX_FLAGS) $(CXX_LIBS) -c $< -o $@
+	$(CXX) $(CXX_FLAGS) -c $< -o $@
 
 gl.o: vender/glad/src/gl.c
 	$(CC) -c -o gl.o vender/glad/src/gl.c -Ivender/glad/include 
