@@ -5,11 +5,7 @@
 #include <iostream>
 #include <ostream>
 
-TextureLibrary::~TextureLibrary() {
-    std::cerr << "TextureLibrary destroyed" << std::endl;
-}
-
-TextureLibrary & TextureLibrary::getInstance() {
+TextureLibrary& TextureLibrary::getInstance() {
     static TextureLibrary textureLibrary;
     return textureLibrary;
 }

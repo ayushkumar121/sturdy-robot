@@ -50,18 +50,19 @@ Basic::Vec2 Gui::transform(Basic::Vec2 point) const {
     return Basic::Vec2{layout.x + point.x, layout.y + point.y + scrollData[getId()]};
 }
 
-void Gui::begin(std::string_view label, Basic::Vec4 rect) {
+void Gui::begin(std::string_view label, Basic::Vec4 rect, bool scrollable) {
     this->label = label;
     this->layout = rect;
     this->cursor = {0.0f, 0.0f};
     this->margin = DEFAULT_MARGIN;
+    this->scrollable = scrollable;
 
     renderer.begin(frameSize);
     textRenderer.begin(frameSize);
 }
 
 void Gui::end() {
-    if (insideRect(mouse, layout)) {
+    if (scrollable && insideRect(mouse, layout)) {
         int id = getId();
         float scroll = scrollData[id];
         scroll += scrollDelta * SCROLL_SPEED;
@@ -128,7 +129,7 @@ void Gui::text(std::string_view text, Basic::Color color, const Font* font) {
                 yPos += font->getSize() * font->getLineSpacing();
             }
 
-            textRenderer.submit({word, {xPos, yPos}, color, font});
+            textRenderer.submit({std::string(word), {xPos, yPos}, color, font});
             xPos += textSize.x;
             start = ++end;
         }
@@ -143,7 +144,7 @@ void Gui::text(std::string_view text, Basic::Color color, const Font* font) {
             yPos += font->getSize() * font->getLineSpacing();
         }
 
-        textRenderer.submit({word, {xPos, yPos}, color, font});
+        textRenderer.submit({std::string(word), {xPos, yPos}, color, font});
     }
     cursor.y += yPos - pos.y + 2*margin;
 }
@@ -163,7 +164,7 @@ bool Gui::button(std::string_view text) {
 
     float textX = pos.x + PADDING;
     float textY = pos.y + (rect.w + textSize.y) / 2.0f;
-    textRenderer.submit({text, {textX, textY}, Basic::hexColor(0xFF000000), font});
+    textRenderer.submit({std::string(text), {textX, textY}, Basic::hexColor(0xFF000000), font});
     cursor.y += rect.w + margin;
 
     return hovered && mouseDown;

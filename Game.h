@@ -4,8 +4,6 @@
 
 #include "Basic.h"
 #include "Gui.h"
-#include "StoryEngine.h"
-#include "TaskEngine.h"
 
 class Game {
 public:
@@ -25,21 +23,27 @@ public:
 	void update(float dt);
 	void render(float dt);
 private:
+	Gui gui;
+
 	Screen screen = Screen::DESKTOP;
 	SubScreen subScreen = SubScreen::NONE;
 	SubScreen targetSubScreen = SubScreen::NONE;
 
 	Basic::Vec2 frameSize{};
-	float subScreenY;
-	float targetSubScreenY;
+	float subScreenY = 2000.0f;
+	float targetSubScreenY = 2000.0f;
+    float subScreenX{};
 
-	Gui gui;
-	StoryEngine storyEngine;
+	float subScreenWidth = 0.0f;
+	float targetSubScreenWidth = 0.0f;
+	float subScreenHeight{};
+	float subScreenDecorationHeight{};
 
 	std::string currentTaskId = "task_01";
 
-	void renderDesktop(float dt);
-	void renderBackground(float dt);
-	void renderSubScreen(float dt);
-	void renderTaskBar(float dt);
+	void renderDesktop();
+	void renderBackground();
+	void renderSubScreen();
+	void renderTaskBar();
+	void renderSubScreenContent();
 };

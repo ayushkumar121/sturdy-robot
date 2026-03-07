@@ -18,8 +18,6 @@ public:
 	};
 	static FontLibrary& getInstance();
 	const Font& getFont(FontType type) const;
-	~FontLibrary();
-
 private:
 	FontLibrary();
 	std::unordered_map<FontType, Font> fonts;

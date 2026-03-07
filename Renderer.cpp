@@ -5,6 +5,7 @@
 #include "DummyTexture.h"
 #include "QuadMesh.h"
 #include "ShaderLibrary.h"
+#include "Camera.h"
 
 void Renderer::begin(Basic::Vec2 frameSize) {
     this->projection = Basic::Mat4::projection(0.0f, 0.0f, frameSize.x, frameSize.y);
@@ -18,7 +19,7 @@ void Renderer::submit(Quad quad) {
 void Renderer::end() {
     const Shader& shader = ShaderLibrary::getInstance().getShader(ShaderLibrary::ShaderType::QUAD);
     shader.bind();
-    shader.setValue("view", Basic::Mat4::identity());
+    shader.setValue("view", Camera::getInstance().transform());
     shader.setValue("projection", projection);
     shader.setValue("tex", 0);
 

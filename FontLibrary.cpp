@@ -42,10 +42,6 @@ FontLibrary::FontLibrary() {
     );
 }
 
-FontLibrary::~FontLibrary() {
-    std::cerr << "Font Library Destroyed" << std::endl;
-}
-
 FontLibrary& FontLibrary::getInstance() {
 	static FontLibrary instance;
 	return instance;

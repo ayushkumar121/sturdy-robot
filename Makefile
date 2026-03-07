@@ -13,7 +13,7 @@ endif
 # Source files
 SRC :=main.cpp Basic.cpp Texture.cpp DummyTexture.cpp TextureLibrary.cpp Shader.cpp ShaderLibrary.cpp \
 QuadMesh.cpp Renderer.cpp Gui.cpp Font.cpp FontLibrary.cpp TextRenderer.cpp \
-StoryEngine.cpp TaskEngine.cpp Game.cpp
+StoryEngine.cpp TaskSystem.cpp Game.cpp EmailSystem.cpp Camera.cpp
 OBJ := $(SRC:.cpp=.o)
 
 all: $(PROJECT_NAME)

@@ -1,29 +1,29 @@
 // Created by ari on 2/28/26.
 
-#include "TaskEngine.h"
+#include "TaskSystem.h"
 
 #include <iostream>
 #include <ostream>
 #include <utility>
 
-const TaskEngine::Message& TaskEngine::Task::getCurrentMessage() {
+const TaskSystem::Message& TaskSystem::Task::getCurrentMessage() {
 	return messages.at(currentMessage);
 }
 
-void TaskEngine::Task::chooseReply(std::string choice) {
+void TaskSystem::Task::chooseReply(std::string choice) {
 	currentMessage = std::move(choice);
 }
 
-void TaskEngine::Task::reset() {
+void TaskSystem::Task::reset() {
 	currentMessage = startMessage;
 }
 
-TaskEngine& TaskEngine::getInstance() {
-	static TaskEngine taskEngine;
-	return taskEngine;
+TaskSystem& TaskSystem::getInstance() {
+	static TaskSystem taskSystem;
+	return taskSystem;
 }
 
-TaskEngine::TaskEngine() {
+TaskSystem::TaskSystem() {
 	// TODO: load from json
 	auto task = Task{
 		"task_01",
@@ -110,30 +110,12 @@ TaskEngine::TaskEngine() {
 				}
 			}
 		},
-		{
-				{
-					"poster",
-					{
-						FileType::IMAGE,
-						"summer-drink-poster.png",
-						"assets/sprites/summer-drink-poster.png"
-					}
-				},
-				{
-					"brief",
-					{
-						FileType::DOCUMENT,
-						"brief.doc",
-						"assets/brief.png"
-					}
-				}
-		},
 		"message_01",
 		"message_01",
 	};
 	tasks.insert({task.id, task});
 }
 
-TaskEngine::Task& TaskEngine::getTask(const std::string& id) {
+TaskSystem::Task& TaskSystem::getTask(const std::string& id) {
 	return tasks.at(id);
 }

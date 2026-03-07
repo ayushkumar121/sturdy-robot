@@ -47,6 +47,10 @@ QuadMesh::~QuadMesh() {
     glDeleteBuffers(1, &vbo);
 }
 
+void QuadMesh::bind() {
+    glBindVertexArray(vao);
+}
+
 void QuadMesh::draw() {
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);

@@ -12,7 +12,6 @@ public:
         QUAD,
         FONT
     };
-    ~ShaderLibrary();
     static ShaderLibrary& getInstance();
     Shader& getShader(ShaderType type);
 private:

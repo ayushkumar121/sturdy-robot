@@ -11,18 +11,19 @@
 #include "TextRenderer.h"
 
 constexpr float DEFAULT_MARGIN = 20.0f;
+constexpr Basic::Color BLACK = {0.0f,0.0f,0.0f,1.0f};
 
 class Gui {
 public:
 	void update(GLFWwindow* window);
-	void begin(std::string_view label, Basic::Vec4 rect);
+	void begin(std::string_view label, Basic::Vec4 rect, bool scrollable=true);
 	void end();
 
 	Basic::Vec2 getCursor();
 	void setCursor(Basic::Vec2 newCursor);
 	float getMargin() const;
 	void setMargin(float margin);
-	void text(std::string_view text, Basic::Color color, const Font* font=nullptr);
+	void text(std::string_view text, Basic::Color color=BLACK, const Font* font=nullptr);
 	bool button(std::string_view label);
 	void image(Texture* texture, Basic::Vec2 size);
 	bool imageButton(Texture* texture, Basic::Vec2 size);
@@ -35,6 +36,7 @@ private:
 	Basic::Vec2 cursor{};
 	float margin{};
 	bool mouseDown{};
+	bool scrollable{};
 
 	Renderer renderer{};
 	TextRenderer textRenderer{};

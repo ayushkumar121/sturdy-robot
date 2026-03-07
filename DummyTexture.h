@@ -8,8 +8,8 @@ public:
     static DummyTexture& getInstance();
     ~DummyTexture();
     void bind(uint32_t slot) const;
-    const int width = 1;
-    const int height = 1;
+    static const int width = 1;
+    static const int height = 1;
 private:
     DummyTexture();
     uint32_t textureId{};
