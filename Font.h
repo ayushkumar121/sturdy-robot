@@ -3,10 +3,12 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 
 #include "Basic.h"
+#include <stb_truetype.h>
 
 class Font {
 public:
@@ -16,7 +18,7 @@ public:
 	    uint32_t height;
 	    int bearingX;
 	    int bearingY;
-	    long advance;
+	    int advance;
 	};
 
 	Font(std::string_view fontPath, uint32_t size);
@@ -33,4 +35,9 @@ private:
 	uint32_t size;
 	float lineSpacing = 1.25f;
 	std::unordered_map<char, Face> faces;
+
+	// stb_truetype
+    std::string fontBuffer;
+    stbtt_fontinfo fontInfo{};
+    float scale = 1.0f;
 };

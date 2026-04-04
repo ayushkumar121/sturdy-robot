@@ -5,8 +5,9 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "stb_image.h"
-#include "glad/gl.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#include <glad/gl.h>
 
 Texture::Texture(std::string texturePath): texturePath(texturePath),textureId(0) {
     std::cout << "Loading texture: " << texturePath << std::endl;
