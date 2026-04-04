@@ -20,18 +20,26 @@ FontLibrary::FontLibrary() {
         FontType::ROBOTO,
         "assets/fonts/Roboto.ttf", fontSize
     );
+    fonts.try_emplace(
+        FontType::ROBOTO_LARGE,
+        "assets/fonts/Roboto.ttf", fontSize * 2.0f
+    );
 	fonts.try_emplace(
         FontType::PLAYFAIR,
         "assets/fonts/Playfair.ttf", fontSize
     );
     fonts.try_emplace(
+        FontType::PLAYFAIR_LARGE,
+        "assets/fonts/Playfair.ttf", fontSize * 2.0f
+    );
+    fonts.try_emplace(
         FontType::PRESS_START,
         "assets/fonts/PressStartRegular.ttf", fontSize
     );
-}
-
-FontLibrary::~FontLibrary() {
-    std::cout << "Font Library Destroyed" << std::endl;
+    fonts.try_emplace(
+        FontType::PRESS_START_LARGE,
+        "assets/fonts/PressStartRegular.ttf", fontSize * 2.0f
+    );
 }
 
 FontLibrary& FontLibrary::getInstance() {

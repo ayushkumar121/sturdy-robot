@@ -6,7 +6,7 @@
 #include <ostream>
 
 ShaderLibrary::ShaderLibrary() {
-    std::cout << "Compiling shaders" << std::endl;
+    std::cerr << "Compiling shaders" << std::endl;
     shaders.emplace(
         ShaderType::QUAD,
         Shader("assets/shaders/basic.vert", "assets/shaders/quad.frag")
@@ -15,10 +15,6 @@ ShaderLibrary::ShaderLibrary() {
         ShaderType::FONT,
         Shader("assets/shaders/basic.vert", "assets/shaders/font.frag")
     );
-}
-
-ShaderLibrary::~ShaderLibrary() {
-    std::cout << "Shader Library Destroyed" << std::endl;
 }
 
 ShaderLibrary& ShaderLibrary::getInstance() {

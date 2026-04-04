@@ -9,8 +9,8 @@
     #include <mach-o/dyld.h>
     #include <vector>
 #else
+    #include <linux/limits.h>
     #include <unistd.h>
-    #include <limits.h>
 #endif
 
 #include "Game.h"
@@ -61,14 +61,15 @@ int main(int argc, char** argv) {
     glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
     glViewport(0, 0, frameWidth, frameHeight);
 
+    game = new Game();
+    glfwSetWindowUserPointer(window, game);
+
     glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
     glfwSetWindowRefreshCallback(window, updateFrame);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    game = new Game();
-    glfwSetWindowUserPointer(window, game);
 
     while (!glfwWindowShouldClose(window)) {
         updateFrame(window);
@@ -92,11 +93,17 @@ void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity
 }
 
 void updateFrame(GLFWwindow *window) {
-    game->update(window);
+    static float lastTime = 0.0;
+    auto currentTime = (float)glfwGetTime();
+    float dt = currentTime - lastTime;
+
+    game->update(dt);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    game->render(window);
+    game->render(dt);
     glfwSwapBuffers(window);
+
+    lastTime = currentTime;
 }
 
 std::filesystem::path getExecutablePath() {

@@ -9,6 +9,7 @@ class QuadMesh {
 public:
     ~QuadMesh();
     static QuadMesh& getInstance();
+    void bind();
     void draw() ;
 
 private:

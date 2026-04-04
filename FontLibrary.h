@@ -10,13 +10,14 @@ class FontLibrary {
 public:
 	enum class FontType {
 		ROBOTO,
+		ROBOTO_LARGE,
 		PLAYFAIR,
-		PRESS_START
+		PLAYFAIR_LARGE,
+		PRESS_START,
+		PRESS_START_LARGE
 	};
 	static FontLibrary& getInstance();
 	const Font& getFont(FontType type) const;
-	~FontLibrary();
-
 private:
 	FontLibrary();
 	std::unordered_map<FontType, Font> fonts;

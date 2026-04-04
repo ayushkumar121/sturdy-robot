@@ -6,7 +6,7 @@
 #include <vector>
 #include <unordered_map>
 
-class TaskEngine {
+class TaskSystem {
 public:
 	struct Choice {
 		std::string text;
@@ -30,7 +30,6 @@ public:
 	struct Task {
 		std::string id;
 		std::unordered_map<std::string, Message> messages;
-		std::unordered_map<std::string, File> files;
 		std::string currentMessage;
 		std::string startMessage;
 
@@ -39,8 +38,9 @@ public:
 		void reset();
 	};
 
-	TaskEngine();
+	static TaskSystem& getInstance();
 	Task& getTask(const std::string &id);
 private:
+	TaskSystem();
 	std::unordered_map<std::string, Task> tasks;
 };

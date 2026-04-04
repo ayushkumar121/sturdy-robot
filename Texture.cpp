@@ -9,13 +9,12 @@
 #include <stb_image.h>
 #include <glad/gl.h>
 
-Texture::Texture(std::string texturePath): texturePath(texturePath),textureId(0) {
-    std::cout << "Loading texture: " << texturePath << std::endl;
+Texture::Texture(std::string_view texturePath) {
+    std::cerr << "Loading texture: " << texturePath << std::endl;
 
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
 
-    // set the texture wrapping/filtering options (on the currently bound texture object)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -23,10 +22,11 @@ Texture::Texture(std::string texturePath): texturePath(texturePath),textureId(0)
 
     // load and generate the texture
     int nrChannels;
-    unsigned char *data = stbi_load(texturePath.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(texturePath.data(), &width, &height, &nrChannels, 0);
     if (!data) {
         throw std::runtime_error("failed to load texture");
     }
+    std::cerr << "Loaded Size: " << width << " " << height << std::endl;
 
     auto format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, format, GL_UNSIGNED_BYTE, data);
@@ -36,7 +36,6 @@ Texture::Texture(std::string texturePath): texturePath(texturePath),textureId(0)
 }
 
 Texture::~Texture() {
-    std::cout << "Texture Deleted " << texturePath << std::endl;
     glDeleteTextures(1, &textureId);
 }
 

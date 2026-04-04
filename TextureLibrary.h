@@ -9,7 +9,6 @@
 
 class TextureLibrary {
 public:
-    ~TextureLibrary();
     static TextureLibrary& getInstance();
     Texture& getTexture(std::string texturePath);
 private:

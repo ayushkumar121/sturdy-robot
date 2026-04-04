@@ -10,33 +10,36 @@
 #include "Renderer.h"
 #include "TextRenderer.h"
 
+constexpr float DEFAULT_MARGIN = 20.0f;
+constexpr Basic::Color BLACK = {0.0f,0.0f,0.0f,1.0f};
+
 class Gui {
 public:
-	Gui();
-	~Gui();
-
-	void begin(std::string_view label, Basic::Vec4 rect);
+	void update(GLFWwindow* window);
+	void begin(std::string_view label, Basic::Vec4 rect, bool scrollable=true);
 	void end();
 
 	Basic::Vec2 getCursor();
-	void moveCursor(Basic::Vec2 pos);
-	void text(std::string_view text, Basic::Color color);
+	void setCursor(Basic::Vec2 newCursor);
+	float getMargin() const;
+	void setMargin(float margin);
+	void text(std::string_view text, Basic::Color color=BLACK, const Font* font=nullptr);
 	bool button(std::string_view label);
 	void image(Texture* texture, Basic::Vec2 size);
 	bool imageButton(Texture* texture, Basic::Vec2 size);
 	void rect(Basic::Color color, Basic::Vec2 size);
 private:
-	GLFWwindow *glfwWindow;
-	const Font* font;
-
-	Renderer renderer{};
-	TextRenderer textRenderer{};
 	Basic::Vec2 frameSize{};
 	std::string_view label;
 	Basic::Vec2 mouse{};
 	Basic::Vec4 layout{};
 	Basic::Vec2 cursor{};
-	bool mouseDown;
+	float margin{};
+	bool mouseDown{};
+	bool scrollable{};
+
+	Renderer renderer{};
+	TextRenderer textRenderer{};
 
 	int getId() const;
 	Basic::Vec2 transform(Basic::Vec2 point) const;

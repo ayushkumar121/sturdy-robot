@@ -2,26 +2,48 @@
 
 #pragma once
 
-#include <GLFW/glfw3.h>
-
-#include "StoryEngine.h"
-#include "TaskEngine.h"
+#include "Basic.h"
+#include "Gui.h"
 
 class Game {
 public:
-	enum GameScreen {
+	enum class Screen {
 		DESKTOP,
+		STORY,
+		MENU,
+	};
+
+	enum class SubScreen {
+		NONE,
 		CHATBOT,
 		EMAIL,
-		CONVERSATION,
 	};
 
 	Game();
-	void update(GLFWwindow* window);
-	void render(GLFWwindow* window);
+	void update(float dt);
+	void render(float dt);
 private:
-	StoryEngine storyEngine;
-	TaskEngine taskEngine;
-	std::string taskId = "task_01";
-	GameScreen gameScreen = DESKTOP;
+	Gui gui;
+
+	Screen screen = Screen::DESKTOP;
+	SubScreen subScreen = SubScreen::NONE;
+	SubScreen targetSubScreen = SubScreen::NONE;
+
+	Basic::Vec2 frameSize{};
+	float subScreenY = 2000.0f;
+	float targetSubScreenY = 2000.0f;
+    float subScreenX{};
+
+	float subScreenWidth = 0.0f;
+	float targetSubScreenWidth = 0.0f;
+	float subScreenHeight{};
+	float subScreenDecorationHeight{};
+
+	std::string currentTaskId = "task_01";
+
+	void renderDesktop();
+	void renderBackground();
+	void renderSubScreen();
+	void renderTaskBar();
+	void renderSubScreenContent();
 };

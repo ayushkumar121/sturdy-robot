@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <string_view>
+#include <string>
 #include <vector>
 
 #include "Basic.h"
@@ -11,16 +11,16 @@
 class TextRenderer {
 public:
 	struct Text {
-		std::string_view data;
+		std::string data;
 		Basic::Vec2 pos;
 		Basic::Color color;
+		const Font* font;
 	};
 
-	void begin(const Font *font, Basic::Vec2 frameSize);
+	void begin(Basic::Vec2 frameSize);
 	void submit(Text text);
 	void end();
 private:
-	const Font* font = nullptr;
 	std::vector<Text> drawList;
 	Basic::Mat4 projection{};
 };

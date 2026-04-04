@@ -128,6 +128,10 @@ std::string Basic::readEntireFile(std::string_view fileName) {
     return content;
 }
 
+float Basic::lerp(float a, float b, float t) {
+    return a + (b-a)*t;
+}
+
 Basic::Color Basic::hexColor(uint32_t hex) {
     float b = (float)(hex & 0xFF)/255.0f;
     float g = (float)((hex >> 8) & 0xFF)/255.0f;

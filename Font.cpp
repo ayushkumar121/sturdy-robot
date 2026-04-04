@@ -71,7 +71,7 @@ Font::Font(std::string_view fontPath, uint32_t size) : size(size) {
 }
 
 Font::~Font(){
-	std::cout << "Font deleted" << std::endl;
+	std::cerr << "Font deleted" << std::endl;
 	for (auto& [_, face] : faces) {
 		glDeleteTextures(1, &face.textureId);
 	}
